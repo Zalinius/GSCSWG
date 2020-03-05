@@ -86,6 +86,59 @@ public class HelloWorld {
 		// Make the window visible
 		glfwShowWindow(window);
 	}
+	
+	private static void shaderErrors(int shader) {
+        int compiled = glGetShaderi(shader, GL_COMPILE_STATUS);
+        String shaderLog = glGetShaderInfoLog(shader);
+        if (shaderLog.trim().length() > 0) {
+        	System.err.println(glGetShaderi(shader, GL_SHADER_TYPE));
+            System.err.println(shaderLog);
+        }
+        if (compiled == 0) {
+            throw new AssertionError("Could not compile shader");
+        }
+	}
+	
+	private static int compileShaders() {
+		int vertShader = glCreateShader(GL_VERTEX_SHADER);
+		int fragShader = glCreateShader(GL_FRAGMENT_SHADER);
+		
+		glShaderSource(vertShader, OBJLoader.readEntireFile("res/shaders/basic.vs"));
+		glShaderSource(fragShader, OBJLoader.readEntireFile("res/shaders/basic.fs"));
+		glCompileShader(vertShader);
+		glCompileShader(fragShader);
+		shaderErrors(vertShader);
+		shaderErrors(fragShader);
+
+		int program = glCreateProgram();
+        glAttachShader(program, vertShader);
+        glAttachShader(program, fragShader);
+        glLinkProgram(program);
+        
+        int linked = glGetProgrami(program, GL_LINK_STATUS);
+        String programLog = glGetProgramInfoLog(program);
+        if (programLog.trim().length() > 0) {
+            System.err.println(programLog);
+        }
+        if (linked == 0) {
+            throw new AssertionError("Could not link program");
+        }
+
+        return program;
+	}
+	
+	private int setupTriangle() {
+		int verts = glGenBuffers();
+		float[] points = {0,0,0,
+						  1,0,0,
+						  1,1,0};
+		
+		glBindBuffer(GL_ARRAY_BUFFER, verts);
+		glBufferData(GL_ARRAY_BUFFER, points, GL_STATIC_DRAW);
+        glVertexPointer(2, GL_FLOAT, 0, 0L);
+		
+		return verts;
+	}
 
 	private void loop() {
 		// This line is critical for LWJGL's interoperation with GLFW's
@@ -94,7 +147,10 @@ public class HelloWorld {
 		// creates the GLCapabilities instance and makes the OpenGL
 		// bindings available for use.
 		GL.createCapabilities();
+		compileShaders();
+		int vbo = setupTriangle();
 
+		glOrtho(-2, 2, -2, 2, -2, 2);
 		// Set the clear color
 		glClearColor(1.0f, 0.5f, 0.0f, 0.0f);
 
@@ -102,7 +158,13 @@ public class HelloWorld {
 		// the window or has pressed the ESCAPE key.
 		while ( !glfwWindowShouldClose(window) ) {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
-
+			
+			glBindBuffer(GL_ARRAY_BUFFER, vbo);
+			glDrawArrays(GL_TRIANGLES, 0, 3);
+			int error = glGetError();
+			if(error != 0) {
+				System.err.println(error);
+			}
 			glfwSwapBuffers(window); // swap the color buffers
 
 			// Poll for window events. The key callback above will only be
