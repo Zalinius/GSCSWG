@@ -19,7 +19,7 @@ public class HelloWorld {
 	private long window;
 
 	public void run() {
-		System.out.println("Hello LWJGL " + Version.getVersion() + "!");
+		System.out.println("LWJGL:  " + Version.getVersion());
 		init();
 		loop();
 
@@ -87,45 +87,7 @@ public class HelloWorld {
 		glfwShowWindow(window);
 	}
 	
-	private static void shaderErrors(int shader) {
-        int compiled = glGetShaderi(shader, GL_COMPILE_STATUS);
-        String shaderLog = glGetShaderInfoLog(shader);
-        if (shaderLog.trim().length() > 0) {
-        	System.err.println(glGetShaderi(shader, GL_SHADER_TYPE));
-            System.err.println(shaderLog);
-        }
-        if (compiled == 0) {
-            throw new AssertionError("Could not compile shader");
-        }
-	}
-	
-	private static int compileShaders() {
-		int vertShader = glCreateShader(GL_VERTEX_SHADER);
-		int fragShader = glCreateShader(GL_FRAGMENT_SHADER);
-		
-		glShaderSource(vertShader, OBJLoader.readEntireFile("res/shaders/basic.vs"));
-		glShaderSource(fragShader, OBJLoader.readEntireFile("res/shaders/basic.fs"));
-		glCompileShader(vertShader);
-		glCompileShader(fragShader);
-		shaderErrors(vertShader);
-		shaderErrors(fragShader);
 
-		int program = glCreateProgram();
-        glAttachShader(program, vertShader);
-        glAttachShader(program, fragShader);
-        glLinkProgram(program);
-        
-        int linked = glGetProgrami(program, GL_LINK_STATUS);
-        String programLog = glGetProgramInfoLog(program);
-        if (programLog.trim().length() > 0) {
-            System.err.println(programLog);
-        }
-        if (linked == 0) {
-            throw new AssertionError("Could not link program");
-        }
-
-        return program;
-	}
 	
 	private RenderableObject setupTriangle() {
 		int vao = glGenVertexArrays();
@@ -165,7 +127,10 @@ public class HelloWorld {
 		// creates the GLCapabilities instance and makes the OpenGL
 		// bindings available for use.
 		GL.createCapabilities();
-		int program = compileShaders();
+		System.out.println("OpenGL: " + glGetInteger(GL_MAJOR_VERSION) + "." + glGetInteger(GL_MINOR_VERSION));
+//	    System.out.println(glGetInteger(GL_MAX_TESS_GEN_LEVEL));
+			
+		int program = new ShaderFactory("res/shaders/", "basic").PROGRAM;
 		RenderableObject object = setupTriangle();
 
 		// Set the clear color
@@ -190,7 +155,7 @@ public class HelloWorld {
 			
 			int error = glGetError();
 			if(error != 0) {
-				System.err.println(error);
+				System.err.println("ERROR:" + error);
 			}
 			
 			glfwSwapBuffers(window); // swap the color buffers
