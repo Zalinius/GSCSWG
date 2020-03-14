@@ -19,7 +19,7 @@ public class HelloWorld {
 	private long window;
 
 	public void run() {
-		System.out.println("Hello LWJGL " + Version.getVersion() + "!");
+		System.out.println("LWJGL:  " + Version.getVersion());
 		init();
 		loop();
 
@@ -86,6 +86,39 @@ public class HelloWorld {
 		// Make the window visible
 		glfwShowWindow(window);
 	}
+	
+
+	
+	private RenderableObject setupTriangle() {
+		int vao = glGenVertexArrays();
+		glBindVertexArray(vao);
+		int vbo = glGenBuffers();
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		
+		float[] vertices = {
+		        // Left bottom triangle
+		        -0.5f, 0.5f, 0f,
+		        -0.5f, -0.5f, 0f,
+		        0.5f, -0.5f, 0f,
+		        // Right top triangle
+		        0.5f, -0.5f, 0f,
+		        0.5f, 0.5f, 0f,
+		        -0.5f, 0.5f, 0f
+		};
+		FloatBuffer verticesBuffer = BufferUtils.createFloatBuffer(vertices.length);
+		verticesBuffer.put(vertices);
+		verticesBuffer.flip();
+		
+		int vertexCount = vertices.length;
+		
+		glBufferData(GL_ARRAY_BUFFER, verticesBuffer, GL_STATIC_DRAW);
+		glVertexAttribPointer(0, 3, GL_FLOAT, false, 0, 0);
+		
+		glBindVertexArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
+		
+		return new RenderableObject(vbo, vao, vertexCount);
+	}
 
 	private void loop() {
 		// This line is critical for LWJGL's interoperation with GLFW's
@@ -94,15 +127,37 @@ public class HelloWorld {
 		// creates the GLCapabilities instance and makes the OpenGL
 		// bindings available for use.
 		GL.createCapabilities();
+		System.out.println("OpenGL: " + glGetInteger(GL_MAJOR_VERSION) + "." + glGetInteger(GL_MINOR_VERSION));
+//	    System.out.println(glGetInteger(GL_MAX_TESS_GEN_LEVEL));
+			
+		int program = new ShaderFactory("res/shaders/", "basic").PROGRAM;
+		RenderableObject object = setupTriangle();
 
 		// Set the clear color
+		glUseProgram(program);
+
 		glClearColor(1.0f, 0.5f, 0.0f, 0.0f);
 
 		// Run the rendering loop until the user has attempted to close
 		// the window or has pressed the ESCAPE key.
 		while ( !glfwWindowShouldClose(window) ) {
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
+			glUseProgram(program);
+			
+			glBindVertexArray(object.VAO);
+			glEnableVertexAttribArray(0);
 
+			glDrawArrays(GL_TRIANGLES, 0, object.VERTICES);
+			
+			glBindVertexArray(0);
+			glDisableVertexAttribArray(0);
+
+			
+			int error = glGetError();
+			if(error != 0) {
+				System.err.println("ERROR:" + error);
+			}
+			
 			glfwSwapBuffers(window); // swap the color buffers
 
 			// Poll for window events. The key callback above will only be
