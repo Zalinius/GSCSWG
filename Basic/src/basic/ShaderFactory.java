@@ -84,7 +84,7 @@ public class ShaderFactory {
         int compiled = glGetShaderi(shader, GL_COMPILE_STATUS);
         String shaderLog = glGetShaderInfoLog(shader);
         if (shaderLog.trim().length() > 0) {
-        	System.err.println(glGetShaderi(shader, GL_SHADER_TYPE));
+        	System.err.println("Shader Type: ." + shaderTypeExtensions().get(glGetShaderi(shader, GL_SHADER_TYPE)));
             System.err.println(shaderLog);
         }
         if (compiled == 0) {
