@@ -1,3 +1,5 @@
+package basic;
+
 import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
@@ -13,7 +15,7 @@ import static org.lwjgl.system.MemoryUtil.*;
 
 import static org.lwjgl.opengl.GL40.*;
 
-public class HelloWorld {
+public class Basic {
 
 	// The window handle
 	private long window;
@@ -167,7 +169,6 @@ public class HelloWorld {
 	}
 
 	public static void main(String[] args) {
-		new HelloWorld().run();
+		new Basic().run();
 	}
-
 }

@@ -2,6 +2,7 @@ apply plugin: "java"
 apply plugin: "eclipse"
 
 project.ext.lwjglVersion = "3.2.3"
+project.ext.jomlVersion = "1.9.22"
 project.ext.lwjglNatives = "natives-windows"
 
 repositories {
@@ -21,4 +22,5 @@ dependencies {
 	runtimeOnly "org.lwjgl:lwjgl-glfw::$lwjglNatives"
 	runtimeOnly "org.lwjgl:lwjgl-opengl::$lwjglNatives"
 	runtimeOnly "org.lwjgl:lwjgl-stb::$lwjglNatives"
+	implementation "org.joml:joml:${jomlVersion}"
 }
