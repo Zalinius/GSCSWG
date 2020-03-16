@@ -4,7 +4,8 @@ import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.*;
-import org.joml.*;
+import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import java.nio.*;
 
@@ -29,6 +30,13 @@ public class Basic {
 	private Vector3f position;
 	private Vector3f direction;
 	private Vector3f center;
+	private Vector3f up;
+	private Vector3f side;
+	private float cameraHorizontalAngle;
+	private float cameraVerticalAngle;
+	
+    private double lastMousePosX, lastMousePosY;
+
 
 	public void run() {
 		System.out.println("LWJGL:  " + Version.getVersion());
@@ -133,22 +141,31 @@ public class Basic {
 		// creates the GLCapabilities instance and makes the OpenGL
 		// bindings available for use.
 		GL.createCapabilities();
-		setKeys();
+		setInput();
 		System.out.println("OpenGL: " + glGetInteger(GL_MAJOR_VERSION) + "." + glGetInteger(GL_MINOR_VERSION));
 		//	    System.out.println(glGetInteger(GL_MAX_TESS_GEN_LEVEL));
 
 		int program = new ShaderFactory("res/shaders/", "basic").PROGRAM;
 		RenderableObject object = setupTriangle();
 
-
+		DoubleBuffer mouseBuffX = BufferUtils.createDoubleBuffer(1);
+		DoubleBuffer mouseBuffY = BufferUtils.createDoubleBuffer(1);
+		glfwGetCursorPos(window, mouseBuffX, mouseBuffY);
+		lastMousePosX = mouseBuffX.get(0);
+		lastMousePosY = mouseBuffY.get(0);
+		
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	    
 		//Set up transformation matrices
 		position = new Vector3f(0,0,1f);
 		direction = new Vector3f(0,0,-1f);
 		center = new Vector3f().add(direction).add(position); 
+		up = new Vector3f(0,1,0);
+		side = new Vector3f(1,0,0);
 		
 		model = new Matrix4f();
 		projection = new Matrix4f().perspective((float)java.lang.Math.toRadians(45), SIXTEEN_BY_NINE , 0.1f, 100f);
-		view = new Matrix4f().lookAt(position.x, position.y, position.z, center.x, center.y, center.z, 0, 1, 0, new Matrix4f());
+		view = new Matrix4f().lookAt(position.x, position.y, position.z, center.x, center.y, center.z, up.x, up.y, up.z, new Matrix4f());
 
 		int mmLoc = glGetUniformLocation(program, "mm");
 		int pmLoc = glGetUniformLocation(program, "pm");
@@ -157,10 +174,7 @@ public class Basic {
 		FloatBuffer mmBuf = BufferUtils.createFloatBuffer(16);
 		FloatBuffer pmBuf = BufferUtils.createFloatBuffer(16);
 		FloatBuffer vmBuf = BufferUtils.createFloatBuffer(16);
-
-
-
-
+		
 		glUseProgram(program);
 
 		// Set the clear color
@@ -176,7 +190,7 @@ public class Basic {
 			glEnableVertexAttribArray(0);
 			
 			center = new Vector3f().add(direction).add(position); 
-			view = new Matrix4f().lookAt(position.x, position.y, position.z, center.x, center.y, center.z, 0, 1, 0, new Matrix4f());
+			view = new Matrix4f().lookAt(position.x, position.y, position.z, center.x, center.y, center.z, up.x, up.y, up.z, new Matrix4f());
 			model.get(mmBuf);
 			projection.get(pmBuf);
 			view.get(vmBuf);
@@ -204,7 +218,7 @@ public class Basic {
 		}
 	}
 
-	private void setKeys() {
+	private void setInput() {
 		// Setup a key callback. It will be called every time a key is pressed, repeated or released.
 		glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
 			if ( key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE ) {
@@ -212,14 +226,53 @@ public class Basic {
 			} else if(key == GLFW_KEY_SPACE && action == GLFW_RELEASE) {
 				System.out.println("Rawr!");
 			} else if(key == GLFW_KEY_W && action == GLFW_RELEASE) {
-				position.z -= 1;
+				position.add(direction);
 			} else if(key == GLFW_KEY_S && action == GLFW_RELEASE) {
-				position.z += 1;
+				position.sub(direction);
 			} else if(key == GLFW_KEY_A && action == GLFW_RELEASE) {
-				position.x -= 1;
+				position.sub(side);
 			} else if(key == GLFW_KEY_D && action == GLFW_RELEASE) {
-				position.x += 1;
+				position.add(side);
 			}
+		});
+		
+		glfwSetCursorPosCallback(window, (window, xpos, ypos) -> {
+	        float dt = 1/60f;
+	        double dx = xpos - lastMousePosX;
+	        double dy = ypos - lastMousePosY;
+	        
+	        System.out.println(xpos + " " +ypos);
+	        
+	        lastMousePosX = xpos;
+	        lastMousePosY = ypos;
+	        
+	        // Convert to spherical coordinates
+	        float cameraAngularSpeed = 10.0f;
+	        cameraHorizontalAngle -= dx * cameraAngularSpeed * dt;
+	        cameraVerticalAngle   -= dy * cameraAngularSpeed * dt;
+	        
+	        // Clamp vertical angle to [-85, 85] degrees
+	        cameraVerticalAngle = java.lang.Math.max(-85.0f, java.lang.Math.min(85.0f, cameraVerticalAngle));
+	        if (cameraHorizontalAngle > 360)
+	        {
+	            cameraHorizontalAngle -= 360;
+	        }
+	        else if (cameraHorizontalAngle < -360)
+	        {
+	            cameraHorizontalAngle += 360;
+	        }
+	        
+	        double theta = java.lang.Math.toRadians(cameraHorizontalAngle);
+	        double phi = java.lang.Math.toRadians(cameraVerticalAngle);
+	        	        
+	        direction.set(-(float)(Math.cos(phi)*Math.sin(theta))
+	        			, (float) Math.sin(phi)
+	        			,-(float)(Math.cos(phi)*Math.cos(theta)));
+	        direction.normalize();
+	        
+	        side.zero().add(direction).cross(up);
+	        side.normalize();
+	        
 		});
 	}
 
