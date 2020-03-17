@@ -30,6 +30,13 @@ import java.util.Set;
 public class ShaderFactory {
 	
 	public final int PROGRAM;
+	
+	public static int basicShadersProgram() {
+		return new ShaderFactory("res/shaders/", "basic").PROGRAM;
+	}
+	public static int colorShadersProgram() {
+		return new ShaderFactory("res/shaders/", "color").PROGRAM;
+	}
 
 	public ShaderFactory(String shaderProgramDirectory, String shaderName) {
 		this(new File(shaderProgramDirectory), shaderName);

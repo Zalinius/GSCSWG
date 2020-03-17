@@ -90,9 +90,8 @@ public class Basic {
 
 	private void loop() {
 
-		int program = new ShaderFactory("res/shaders/", "basic").PROGRAM;
-		RenderableObject object = RenderableObject.BEZIER_SPLINE;
-		glPointSize(10);
+		int program = ShaderFactory.colorShadersProgram();
+		RenderableObject object = RenderableObject.COLOR_QUAD;
 
 		//Set up transformation matrices
 		model = new Matrix4f();
@@ -110,7 +109,7 @@ public class Basic {
 		glUseProgram(program);
 
 		// Set the clear color
-		glClearColor(1.0f, 0.5f, 0.0f, 0.0f);
+		glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
 
 		// Run the rendering loop until the user has attempted to close
 		// the window or has pressed the ESCAPE key.
@@ -128,7 +127,7 @@ public class Basic {
 			glUniformMatrix4fv(pmLoc, false, pmBuf);
 			glUniformMatrix4fv(vmLoc, false, vmBuf);
 
-			glDrawArrays(GL_LINE_STRIP, 0, object.VERTICES);
+			glDrawArrays(object.RENDER_MODE, 0, object.VERTICES);
 
 			glBindVertexArray(0);
 			glDisableVertexAttribArray(0);
