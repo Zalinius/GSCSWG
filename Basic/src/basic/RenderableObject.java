@@ -39,6 +39,7 @@ public class RenderableObject {
 	public static final RenderableObject QUAD = setupQuad();
 	public static final RenderableObject COLOR_QUAD = setupColorQuad();
 	public static final RenderableObject BEZIER_SPLINE = sampleSplineCurve();
+	public static final RenderableObject AXES_COLORED = coloredAxes();
 	
 	
 	private static RenderableObject setupVertices(float[] vertices, int renderMode) {
@@ -85,6 +86,34 @@ public class RenderableObject {
 		glVertexAttribPointer(attributeIndex, dimensionality, GL_FLOAT, false, 0, 0);	
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		GL20.glEnableVertexAttribArray(attributeIndex);
+	}
+	
+	private static RenderableObject coloredAxes() {
+		float[] vertices = {
+				//X - axis
+				0.0f, 0.0f, 0.0f,
+				10.0f, 0.0f, 0.0f,
+				//Y
+				0.0f, 0.0f, 0.0f,
+				0.0f, 10.0f, 0.0f,
+				//Z
+				0.0f, 0.0f, 0.0f,
+				0.0f, 0.0f, 10.0f
+		};
+		
+		float[] colors = {
+				//X - axis - RED
+				1.0f, 0.0f, 0.0f,
+				1.0f, 0.0f, 0.0f,
+				//Y - axis - GREEN
+				0.0f, 1.0f, 0.0f,
+				0.0f, 1.0f, 0.0f,
+				//Z - axis - BLUE
+				0.0f, 0.0f, 1.0f,
+				0.0f, 0.0f, 1.0f
+		};
+		
+		return setupVerticesWithColors(vertices, colors, GL11.GL_LINES);
 	}
 	
 	

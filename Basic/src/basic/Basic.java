@@ -91,7 +91,7 @@ public class Basic {
 	private void loop() {
 
 		int program = ShaderFactory.colorShadersProgram();
-		RenderableObject object = RenderableObject.COLOR_QUAD;
+		RenderableObject object = RenderableObject.AXES_COLORED;
 
 		//Set up transformation matrices
 		model = new Matrix4f();
