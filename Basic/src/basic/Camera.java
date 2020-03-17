@@ -1,15 +1,13 @@
 package basic;
 
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_A;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_D;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_S;
-import static org.lwjgl.glfw.GLFW.GLFW_KEY_W;
-import static org.lwjgl.glfw.GLFW.GLFW_RELEASE;
+import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.glfw.GLFW.glfwGetCursorPos;
 
 import java.nio.DoubleBuffer;
 
 import org.joml.Matrix4f;
+import org.joml.Vector2f;
+import org.joml.Vector2i;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;
 
@@ -23,6 +21,9 @@ public class Camera {
 	private float cameraVerticalAngle;
     private double lastMousePosX;
     private double lastMousePosY;
+    
+    private Vector2i movement;
+    private float speed;
 
 	private Matrix4f view;
 	
@@ -38,6 +39,8 @@ public class Camera {
 		glfwGetCursorPos(window, mouseBuffX, mouseBuffY);
 		lastMousePosX = mouseBuffX.get(0);
 		lastMousePosY = mouseBuffY.get(0);
+		movement = new Vector2i();
+		speed = 1;
 		
 		view = new Matrix4f();
 		view.lookAt(position, center, up, new Matrix4f());
@@ -49,17 +52,46 @@ public class Camera {
 		view = new Matrix4f().lookAt(position, center, up, new Matrix4f());
 		return view;
 	}
+	
+	public void update(float dt) {
+		Vector3f forwardMotion = new Vector3f().add(direction).mul(movement.y).mul(dt * speed);
+		Vector3f horizontalMotion = new Vector3f().add(side).mul(movement.x).mul(dt * speed);
+		
+		position.add(forwardMotion).add(horizontalMotion);
+	}
 
 
 	public void keyInput(int key, int action) {
-		if(key == GLFW_KEY_W && action == GLFW_RELEASE) {
-			position.add(direction);
-		} else if(key == GLFW_KEY_S && action == GLFW_RELEASE) {
-			position.sub(direction);
-		} else if(key == GLFW_KEY_A && action == GLFW_RELEASE) {
-			position.sub(side);
-		} else if(key == GLFW_KEY_D && action == GLFW_RELEASE) {
-			position.add(side);
+		if(key == GLFW_KEY_W) {
+			if(action == GLFW_PRESS) {
+				movement.y += 1;
+			}else if (action == GLFW_RELEASE) {
+				movement.y -= 1;
+			}
+		} else if(key == GLFW_KEY_S) {
+			if(action == GLFW_PRESS) {
+				movement.y -= 1;
+			}else if (action == GLFW_RELEASE) {
+				movement.y += 1;
+			}
+		} else if(key == GLFW_KEY_A) {
+			if(action == GLFW_PRESS) {
+				movement.x -= 1;
+			}else if (action == GLFW_RELEASE) {
+				movement.x += 1;
+			}
+		} else if(key == GLFW_KEY_D) {
+			if(action == GLFW_PRESS) {
+				movement.x += 1;
+			}else if (action == GLFW_RELEASE) {
+				movement.x -= 1;
+			}
+		} else if(key == GLFW_KEY_LEFT_SHIFT) {
+			if(action == GLFW_PRESS) {
+				speed = 5;
+			}else if (action == GLFW_RELEASE) {
+				speed = 1;
+			}
 		}
 	}
 	

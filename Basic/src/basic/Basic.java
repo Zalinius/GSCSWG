@@ -113,7 +113,11 @@ public class Basic {
 
 		// Run the rendering loop until the user has attempted to close
 		// the window or has pressed the ESCAPE key.
+	    double lastFrameTime = glfwGetTime();
+
 		while ( !glfwWindowShouldClose(window) ) {
+	        // Frame time calculation
+
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 			glUseProgram(program);
 
@@ -140,9 +144,17 @@ public class Basic {
 
 			glfwSwapBuffers(window); // swap the color buffers
 			glfwPollEvents();
+			
+	        double dt = glfwGetTime() - lastFrameTime;
+	        lastFrameTime += dt;
+	        update((float)dt);
 		}
 	}
 
+	private void update(float delta) {
+		camera.update(delta);
+	}
+	
 	private String description(int error) {
 		switch (error) {
 		case 1280:	
