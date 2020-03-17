@@ -6,7 +6,6 @@ import static org.lwjgl.glfw.GLFW.glfwGetCursorPos;
 import java.nio.DoubleBuffer;
 
 import org.joml.Matrix4f;
-import org.joml.Vector2f;
 import org.joml.Vector2i;
 import org.joml.Vector3f;
 import org.lwjgl.BufferUtils;

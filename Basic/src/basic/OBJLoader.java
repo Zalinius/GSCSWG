@@ -6,19 +6,9 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Iterator;
 import java.util.List;
 
 public class OBJLoader {
-	public static void importOBJ(String file) {
-		List<String> objLines = readEntireFileLines(file);
-		for (Iterator<String> it = objLines.iterator(); it.hasNext();) {
-			String line = it.next();
-			
-
-		}
-	}
-	
 	public static List<String> readEntireFileLines(String file) {
 		List<String> lines = null;
 		try {
