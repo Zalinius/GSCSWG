@@ -28,24 +28,14 @@ public class RenderableObject {
 
 
 	public static final RenderableObject QUAD = setupQuad();
-
-
-	private static RenderableObject setupQuad() {
+	
+	private static RenderableObject setupVertices(float[] vertices) {
 		int vao = glGenVertexArrays();
 		glBindVertexArray(vao);
 		int vbo = glGenBuffers();
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-		float[] vertices = {
-				// Left bottom triangle
-				-0.5f, 0.5f, 0f,
-				-0.5f, -0.5f, 0f,
-				0.5f, -0.5f, 0f,
-				// Right top triangle
-				0.5f, -0.5f, 0f,
-				0.5f, 0.5f, 0f,
-				-0.5f, 0.5f, 0f
-		};
+
 		FloatBuffer verticesBuffer = BufferUtils.createFloatBuffer(vertices.length);
 		verticesBuffer.put(vertices);
 		verticesBuffer.flip();
@@ -59,6 +49,21 @@ public class RenderableObject {
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 		return new RenderableObject(vbo, vao, vertexCount);
+	}
+
+
+	private static RenderableObject setupQuad() {
+		float[] vertices = {
+				// Left bottom triangle
+				-0.5f, 0.5f, 0f,
+				-0.5f, -0.5f, 0f,
+				0.5f, -0.5f, 0f,
+				// Right top triangle
+				0.5f, -0.5f, 0f,
+				0.5f, 0.5f, 0f,
+				-0.5f, 0.5f, 0f
+		};
+		return setupVertices(vertices);
 	}
 
 }
