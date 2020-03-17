@@ -91,7 +91,8 @@ public class Basic {
 	private void loop() {
 
 		int program = new ShaderFactory("res/shaders/", "basic").PROGRAM;
-		RenderableObject object = RenderableObject.QUAD;
+		RenderableObject object = RenderableObject.BEZIER_SPLINE;
+		glPointSize(10);
 
 		//Set up transformation matrices
 		model = new Matrix4f();
@@ -127,19 +128,28 @@ public class Basic {
 			glUniformMatrix4fv(pmLoc, false, pmBuf);
 			glUniformMatrix4fv(vmLoc, false, vmBuf);
 
-			glDrawArrays(GL_TRIANGLES, 0, object.VERTICES);
+			glDrawArrays(GL_LINE_STRIP, 0, object.VERTICES);
 
 			glBindVertexArray(0);
 			glDisableVertexAttribArray(0);
 
-
 			int error = glGetError();
 			if(error != 0) {
-				System.err.println("ERROR:" + error);
+				System.err.println("ERROR:" + error + " - " + description(error));
+				
 			}
 
 			glfwSwapBuffers(window); // swap the color buffers
 			glfwPollEvents();
+		}
+	}
+
+	private String description(int error) {
+		switch (error) {
+		case 1280:	
+			return "Invalid Enum";
+		default:
+			return "No Description";
 		}
 	}
 

@@ -67,9 +67,7 @@ public class Camera {
         float dt = 1/60f; //TODO get real DeltaTime
         double dx = xpos - lastMousePosX;
         double dy = ypos - lastMousePosY;
-        
-        System.out.println(xpos + " " +ypos);
-        
+                
         lastMousePosX = xpos;
         lastMousePosY = ypos;
         
