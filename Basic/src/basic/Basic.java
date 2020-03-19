@@ -27,7 +27,7 @@ public class Basic {
 
 	private long window;
 	private Matrix4f projection;
-	private Matrix4f model;
+	private Matrix4f modelMatrix;
 	private Camera camera;
 
 	public void run() {
@@ -81,6 +81,7 @@ public class Basic {
 		glfwShowWindow(window);
 		GL.createCapabilities(); //critical for LWJGL's interoperation with GLFW's
 		initializeInput();
+		initializeTesselation();
 
 		System.out.println("LWJGL:  " + Version.getVersion());
 		System.out.println("OpenGL: " + glGetInteger(GL_MAJOR_VERSION) + "." + glGetInteger(GL_MINOR_VERSION));
@@ -91,14 +92,14 @@ public class Basic {
 	private void loop() {
 
 		int cProgram = ShaderFactory.colorShadersProgram();
-		int bProgram = ShaderFactory.basicShadersProgram();
+		int bProgram = ShaderFactory.tessShadersProgram();
 		int activeProgram = cProgram;
 		RenderableObject axes = RenderableObject.AXES_COLORED;
-		RenderableObject spline = RenderableObject.BEZIER_SPLINE;
-		System.out.println(spline.VERTICES);
+		RenderableObject model = RenderableObject.MESH_TRIANGLE;
+		System.out.println(model.VERTICES);
 
 		//Set up transformation matrices
-		model = new Matrix4f();
+		modelMatrix = new Matrix4f();
 		camera = new Camera(window);
 		projection = new Matrix4f().perspective((float)java.lang.Math.toRadians(45), SIXTEEN_BY_NINE , 0.1f, 100f);
 
@@ -109,17 +110,17 @@ public class Basic {
 
 		// Run the rendering loop until the user has attempted to close
 		// the window or has pressed the ESCAPE key.
-	    double lastFrameTime = glfwGetTime();
+		double lastFrameTime = glfwGetTime();
 
 		while ( !glfwWindowShouldClose(window) ) {
-	        // Frame time calculation
+			// Frame time calculation
 
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
 			activeProgram = bProgram;
 			glUseProgram(activeProgram);
 
-			glBindVertexArray(spline.VAO);
-			
+			glBindVertexArray(model.VAO);
+
 			int mmLoc = glGetUniformLocation(activeProgram, "mm");
 			int pmLoc = glGetUniformLocation(activeProgram, "pm");
 			int vmLoc = glGetUniformLocation(activeProgram, "vm");
@@ -128,23 +129,24 @@ public class Basic {
 			FloatBuffer pmBuf = BufferUtils.createFloatBuffer(16);
 			FloatBuffer vmBuf = BufferUtils.createFloatBuffer(16);
 
-			model.get(mmBuf);
+			modelMatrix.get(mmBuf);
 			projection.get(pmBuf);
 			camera.view().get(vmBuf);
 			glUniformMatrix4fv(mmLoc, false, mmBuf);
 			glUniformMatrix4fv(pmLoc, false, pmBuf);
 			glUniformMatrix4fv(vmLoc, false, vmBuf);
+			checkError("model uniform calls");
 
-			glDrawArrays(spline.RENDER_MODE, 0, spline.VERTICES);
-			
-			
-			
-			
+			glDrawArrays(model.RENDER_MODE, 0, model.VERTICES);
+
+			checkError("model draw call");
+
+
 			activeProgram = cProgram;
 			glUseProgram(activeProgram);
 
 			glBindVertexArray(axes.VAO);
-			
+
 			mmLoc = glGetUniformLocation(activeProgram, "mm");
 			pmLoc = glGetUniformLocation(activeProgram, "pm");
 			vmLoc = glGetUniformLocation(activeProgram, "vm");
@@ -153,7 +155,7 @@ public class Basic {
 			pmBuf = BufferUtils.createFloatBuffer(16);
 			vmBuf = BufferUtils.createFloatBuffer(16);
 
-			model.get(mmBuf);
+			modelMatrix.get(mmBuf);
 			projection.get(pmBuf);
 			camera.view().get(vmBuf);
 			glUniformMatrix4fv(mmLoc, false, mmBuf);
@@ -161,32 +163,30 @@ public class Basic {
 			glUniformMatrix4fv(vmLoc, false, vmBuf);
 
 			glDrawArrays(axes.RENDER_MODE, 0, axes.VERTICES);
+			checkError("axes draw call");
+
 
 			glBindVertexArray(0);
 
-			int error = glGetError();
-			if(error != 0) {
-				System.err.println("ERROR:" + error + " - " + description(error));
-				
-			}
-
 			glfwSwapBuffers(window); // swap the color buffers
 			glfwPollEvents();
-			
-	        double dt = glfwGetTime() - lastFrameTime;
-	        lastFrameTime += dt;
-	        update((float)dt);
+
+			double dt = glfwGetTime() - lastFrameTime;
+			lastFrameTime += dt;
+			update((float)dt);
 		}
 	}
 
 	private void update(float delta) {
 		camera.update(delta);
 	}
-	
+
 	private String description(int error) {
 		switch (error) {
-		case 1280:	
+		case GL_INVALID_ENUM:	
 			return "Invalid Enum";
+		case GL_INVALID_OPERATION:
+			return "Invalid Operation";
 		default:
 			return "No Description";
 		}
@@ -200,6 +200,20 @@ public class Basic {
 		// Terminate GLFW and free the error callback
 		glfwTerminate();
 		glfwSetErrorCallback(null).free();
+	}
+
+	private void checkError(String location) {
+		int error = glGetError();
+		if(error != 0) {
+			String message;
+			if(location.isEmpty()) {
+				message = "ERROR:" + error + " - " + description(error);
+			}
+			else {
+				message = "ERROR after " + location + ":" + error + " - " + description(error);
+			}
+			System.err.println(message);	
+		}
 	}
 
 	private void initializeInput() {
@@ -218,6 +232,10 @@ public class Basic {
 			camera.mouseMoved(xpos, ypos);
 		});
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+	}
+
+	private void initializeTesselation() {
+		glPatchParameteri(GL_PATCH_VERTICES, 1);
 	}
 
 }

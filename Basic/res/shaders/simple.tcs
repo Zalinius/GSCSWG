@@ -1,16 +1,53 @@
 #version 430 core
  
-layout(vertices = 4) out;
+//output patch size
+layout(vertices = 3) out;
+
+//Built-in variables
+
+in int gl_PatchVerticesIn[];
+in int gl_PrimitiveID[];
+in int gl_InvocationID[];
+
+//Vertex shader output
+in gl_PerVertex
+{
+  vec4 gl_Position;
+  float gl_PointSize;
+  float gl_ClipDistance[];
+} vertex_in[gl_MaxPatchVertices];
+
+//Built-in output variables
+patch out float gl_TessLevelOuter[4];
+patch out float gl_TessLevelInner[2];
+
+out gl_PerVertex
+{
+  vec4 gl_Position;
+  float gl_PointSize;
+  float gl_ClipDistance[];
+} output_to_TES[];
+
  
 void main(void)
 {
  gl_TessLevelOuter[0] = 2.0;
  gl_TessLevelOuter[1] = 4.0;
  gl_TessLevelOuter[2] = 6.0;
- gl_TessLevelOuter[3] = 8.0;
+ //gl_TessLevelOuter[3] = 8.0; //Irrelevant for triangles
  
  gl_TessLevelInner[0] = 8.0;
- gl_TessLevelInner[1] = 8.0;
- 
- gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
+ //gl_TessLevelInner[1] = 8.0; //Irrelevant for triangles
+ if(mod(gl_InvocationID, 3) == 0){
+	 output_to_TES[gl_InvocationID].gl_Position = vertex_in[gl_InvocationID].gl_Position;
+	 output_to_TES[gl_InvocationID].gl_Position.x += 1.0f;
+ }
+  if(mod(gl_InvocationID, 3) == 1){
+	 output_to_TES[gl_InvocationID].gl_Position = vertex_in[gl_InvocationID].gl_Position;
+	 	 output_to_TES[gl_InvocationID].gl_Position.y += 1.0f;
+ }
+  if(mod(gl_InvocationID, 3) == 2){
+	 output_to_TES[gl_InvocationID].gl_Position = vertex_in[gl_InvocationID].gl_Position;
+
+ }
 }

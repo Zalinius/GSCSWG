@@ -37,6 +37,9 @@ public class ShaderFactory {
 	public static int colorShadersProgram() {
 		return new ShaderFactory("res/shaders/", "color").PROGRAM;
 	}
+	public static int tessShadersProgram() {
+		return new ShaderFactory("res/shaders/", "simple").PROGRAM;
+	}
 
 	public ShaderFactory(String shaderProgramDirectory, String shaderName) {
 		this(new File(shaderProgramDirectory), shaderName);
