@@ -90,23 +90,19 @@ public class Basic {
 
 	private void loop() {
 
-		int program = ShaderFactory.colorShadersProgram();
-		RenderableObject object = RenderableObject.AXES_COLORED;
+		int cProgram = ShaderFactory.colorShadersProgram();
+		int bProgram = ShaderFactory.basicShadersProgram();
+		int activeProgram = cProgram;
+		RenderableObject axes = RenderableObject.AXES_COLORED;
+		RenderableObject spline = RenderableObject.BEZIER_SPLINE;
+		System.out.println(spline.VERTICES);
 
 		//Set up transformation matrices
 		model = new Matrix4f();
 		camera = new Camera(window);
 		projection = new Matrix4f().perspective((float)java.lang.Math.toRadians(45), SIXTEEN_BY_NINE , 0.1f, 100f);
 
-		int mmLoc = glGetUniformLocation(program, "mm");
-		int pmLoc = glGetUniformLocation(program, "pm");
-		int vmLoc = glGetUniformLocation(program, "vm");
 
-		FloatBuffer mmBuf = BufferUtils.createFloatBuffer(16);
-		FloatBuffer pmBuf = BufferUtils.createFloatBuffer(16);
-		FloatBuffer vmBuf = BufferUtils.createFloatBuffer(16);
-
-		glUseProgram(program);
 
 		// Set the clear color
 		glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
@@ -119,10 +115,18 @@ public class Basic {
 	        // Frame time calculation
 
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
-			glUseProgram(program);
+			activeProgram = bProgram;
+			glUseProgram(activeProgram);
 
-			glBindVertexArray(object.VAO);
-			glEnableVertexAttribArray(0);
+			glBindVertexArray(spline.VAO);
+			
+			int mmLoc = glGetUniformLocation(activeProgram, "mm");
+			int pmLoc = glGetUniformLocation(activeProgram, "pm");
+			int vmLoc = glGetUniformLocation(activeProgram, "vm");
+
+			FloatBuffer mmBuf = BufferUtils.createFloatBuffer(16);
+			FloatBuffer pmBuf = BufferUtils.createFloatBuffer(16);
+			FloatBuffer vmBuf = BufferUtils.createFloatBuffer(16);
 
 			model.get(mmBuf);
 			projection.get(pmBuf);
@@ -131,10 +135,34 @@ public class Basic {
 			glUniformMatrix4fv(pmLoc, false, pmBuf);
 			glUniformMatrix4fv(vmLoc, false, vmBuf);
 
-			glDrawArrays(object.RENDER_MODE, 0, object.VERTICES);
+			glDrawArrays(spline.RENDER_MODE, 0, spline.VERTICES);
+			
+			
+			
+			
+			activeProgram = cProgram;
+			glUseProgram(activeProgram);
+
+			glBindVertexArray(axes.VAO);
+			
+			mmLoc = glGetUniformLocation(activeProgram, "mm");
+			pmLoc = glGetUniformLocation(activeProgram, "pm");
+			vmLoc = glGetUniformLocation(activeProgram, "vm");
+
+			mmBuf = BufferUtils.createFloatBuffer(16);
+			pmBuf = BufferUtils.createFloatBuffer(16);
+			vmBuf = BufferUtils.createFloatBuffer(16);
+
+			model.get(mmBuf);
+			projection.get(pmBuf);
+			camera.view().get(vmBuf);
+			glUniformMatrix4fv(mmLoc, false, mmBuf);
+			glUniformMatrix4fv(pmLoc, false, pmBuf);
+			glUniformMatrix4fv(vmLoc, false, vmBuf);
+
+			glDrawArrays(axes.RENDER_MODE, 0, axes.VERTICES);
 
 			glBindVertexArray(0);
-			glDisableVertexAttribArray(0);
 
 			int error = glGetError();
 			if(error != 0) {

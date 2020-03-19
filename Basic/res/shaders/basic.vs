@@ -1,5 +1,5 @@
 #version 430
-in vec3 vertex;
+layout(location = 0) in vec3 vertex;
  
 out gl_PerVertex { vec4 gl_Position; };
 
