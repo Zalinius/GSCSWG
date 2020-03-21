@@ -8,11 +8,7 @@ out gl_PerVertex
   float gl_ClipDistance[];
 } vertex_out;
 
-uniform mat4 mm;
-uniform mat4 vm;
-uniform mat4 pm;
-
 void main()
 {
-	vertex_out.gl_Position = pm*vm*mm*vec4(vertex, 1.0f);
+	vertex_out.gl_Position = vec4(vertex, 1.0f);
 }
