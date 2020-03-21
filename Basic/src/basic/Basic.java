@@ -124,6 +124,7 @@ public class Basic {
 			int mmLoc = glGetUniformLocation(activeProgram, "mm");
 			int pmLoc = glGetUniformLocation(activeProgram, "pm");
 			int vmLoc = glGetUniformLocation(activeProgram, "vm");
+			int tlLoc = glGetUniformLocation(activeProgram, "tessLevel");
 
 			FloatBuffer mmBuf = BufferUtils.createFloatBuffer(16);
 			FloatBuffer pmBuf = BufferUtils.createFloatBuffer(16);
@@ -135,6 +136,7 @@ public class Basic {
 			glUniformMatrix4fv(mmLoc, false, mmBuf);
 			glUniformMatrix4fv(pmLoc, false, pmBuf);
 			glUniformMatrix4fv(vmLoc, false, vmBuf);
+			glUniform1f(tlLoc, tesselation);
 			checkError("model uniform calls");
 
 			glDrawArrays(model.RENDER_MODE, 0, model.VERTICES);
@@ -223,6 +225,12 @@ public class Basic {
 				glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
 			} else if(key == GLFW_KEY_SPACE && action == GLFW_RELEASE) {
 				System.out.println("Rawr!");
+			} else if (key == GLFW_KEY_E && action == GLFW_RELEASE){
+				tesselation ++;
+				tesselation = Math.min(64, tesselation);
+			} else if (key == GLFW_KEY_Q && action == GLFW_RELEASE){
+				tesselation --;
+				tesselation = Math.max(1, tesselation);
 			} else {
 				camera.keyInput(key, action);
 			}
@@ -234,8 +242,10 @@ public class Basic {
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	}
 
+	private int tesselation;
 	private void initializeTesselation() {
 		glPatchParameteri(GL_PATCH_VERTICES, 1);
+		tesselation = 1;
 	}
 
 }
