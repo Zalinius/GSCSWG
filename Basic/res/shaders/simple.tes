@@ -36,5 +36,7 @@ void main()
   gl_Position = gl_TessCoord[0].x * input_from_TCS[0].gl_Position
 			  + gl_TessCoord[0].y * input_from_TCS[1].gl_Position
 			  + gl_TessCoord[0].z * input_from_TCS[2].gl_Position;
+  float centrality = min(min(gl_TessCoord[0].x, gl_TessCoord[0].y), gl_TessCoord[0].z);
+  gl_Position.z += 4*centrality*centrality;
   gl_Position = pm*vm*mm*gl_Position;
 }
