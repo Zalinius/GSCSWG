@@ -41,6 +41,9 @@ public class ShaderFactory {
 	public static int tessShadersProgram() {
 		return new ShaderFactory("res/shaders/", "simple").PROGRAM;
 	}
+	public static int splineCurveTessShadersProgram() {
+		return new ShaderFactory("res/shaders/", "bezier").PROGRAM;
+	}
 
 	public ShaderFactory(String shaderProgramDirectory, String shaderName) {
 		this(new File(shaderProgramDirectory), shaderName);
@@ -149,8 +152,8 @@ public class ShaderFactory {
 		map.put(GL_VERTEX_SHADER, VS);
 		map.put(GL_TESS_CONTROL_SHADER, TCS);
 		map.put(GL_TESS_EVALUATION_SHADER, TES);
-		map.put(GL_FRAGMENT_SHADER, FS);
 		map.put(GL_GEOMETRY_SHADER, GS);
+		map.put(GL_FRAGMENT_SHADER, FS);
 		
 		return map;
 	}
@@ -159,8 +162,8 @@ public class ShaderFactory {
 		map.put(VS, GL_VERTEX_SHADER);
 		map.put(TCS, GL_TESS_CONTROL_SHADER);
 		map.put(TES, GL_TESS_EVALUATION_SHADER);
-		map.put(FS, GL_FRAGMENT_SHADER);
 		map.put(GS, GL_GEOMETRY_SHADER);
+		map.put(FS, GL_FRAGMENT_SHADER);
 		return map;
 	}
 
