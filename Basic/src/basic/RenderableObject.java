@@ -41,6 +41,7 @@ public class RenderableObject {
 	public static final RenderableObject MESH_TRIANGLE = setupMeshTriangle();
 	public static final RenderableObject COLOR_QUAD = setupColorQuad();
 	public static final RenderableObject BEZIER_SPLINE = sampleSplineCurve();
+	public static final RenderableObject BEZIER_SPLINE_POINTS = splineCurvePoints();
 	public static final RenderableObject AXES_COLORED = coloredAxes();
 	
 	
@@ -118,6 +119,18 @@ public class RenderableObject {
 		return setupVerticesWithColors(vertices, colors, GL11.GL_LINES);
 	}
 	
+	private static RenderableObject splineCurvePoints() {
+		Vector3f p1 = new Vector3f(0.1f,0.1f,0.1f);
+		Vector3f p2 = new Vector3f(1.1f,0.1f,0.1f);
+		Vector3f p3 = new Vector3f(1.1f,1.1f,1.1f);
+		Vector3f p4 = new Vector3f(0.1f,1.1f,1.1f);
+		List<Vector3f> points = new ArrayList<>();
+		points.add(p1);
+		points.add(p2);
+		points.add(p3);
+		points.add(p4);
+		return setupPoints(points, GL40.GL_PATCHES);
+	}
 	
 	private static RenderableObject sampleSplineCurve() {
 		Vector3f p1 = new Vector3f(0.0f,0.0f,0.0f);

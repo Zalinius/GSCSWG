@@ -92,10 +92,12 @@ public class Basic {
 	private void loop() {
 
 		int cProgram = ShaderFactory.colorShadersProgram();
-		int bProgram = ShaderFactory.tessShadersProgram();
+		int bProgram = ShaderFactory.splineCurveTessShadersProgram();
+		int oldProgram = ShaderFactory.basicShadersProgram();
 		int activeProgram = cProgram;
 		RenderableObject axes = RenderableObject.AXES_COLORED;
-		RenderableObject model = RenderableObject.MESH_TRIANGLE;
+		RenderableObject model = RenderableObject.BEZIER_SPLINE_POINTS;
+		RenderableObject sample = RenderableObject.BEZIER_SPLINE;
 		System.out.println(model.VERTICES);
 
 		//Set up transformation matrices
@@ -166,7 +168,31 @@ public class Basic {
 
 			glDrawArrays(axes.RENDER_MODE, 0, axes.VERTICES);
 			checkError("axes draw call");
+			
+			
+			
+			activeProgram = oldProgram;
+			glUseProgram(activeProgram);
 
+			glBindVertexArray(sample.VAO);
+
+			mmLoc = glGetUniformLocation(activeProgram, "mm");
+			pmLoc = glGetUniformLocation(activeProgram, "pm");
+			vmLoc = glGetUniformLocation(activeProgram, "vm");
+
+			mmBuf = BufferUtils.createFloatBuffer(16);
+			pmBuf = BufferUtils.createFloatBuffer(16);
+			vmBuf = BufferUtils.createFloatBuffer(16);
+
+			modelMatrix.get(mmBuf);
+			projection.get(pmBuf);
+			camera.view().get(vmBuf);
+			glUniformMatrix4fv(mmLoc, false, mmBuf);
+			glUniformMatrix4fv(pmLoc, false, pmBuf);
+			glUniformMatrix4fv(vmLoc, false, vmBuf);
+
+			glDrawArrays(sample.RENDER_MODE, 0, sample.VERTICES);
+			checkError("sample draw call");
 
 			glBindVertexArray(0);
 
@@ -226,10 +252,10 @@ public class Basic {
 			} else if(key == GLFW_KEY_SPACE && action == GLFW_RELEASE) {
 				System.out.println("Rawr!");
 			} else if (key == GLFW_KEY_E && action == GLFW_RELEASE){
-				tesselation ++;
+				tesselation *= 2;
 				tesselation = Math.min(64, tesselation);
 			} else if (key == GLFW_KEY_Q && action == GLFW_RELEASE){
-				tesselation --;
+				tesselation /= 2;
 				tesselation = Math.max(1, tesselation);
 			} else {
 				camera.keyInput(key, action);
@@ -244,8 +270,9 @@ public class Basic {
 
 	private int tesselation;
 	private void initializeTesselation() {
-		glPatchParameteri(GL_PATCH_VERTICES, 1);
-		tesselation = 1;
+		//4 for bezier splines
+		glPatchParameteri(GL_PATCH_VERTICES, 4);
+		tesselation = 16;
 	}
 
 }
