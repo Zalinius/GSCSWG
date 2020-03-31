@@ -5,6 +5,7 @@ import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
 import static org.lwjgl.opengl.GL20.GL_LINK_STATUS;
 import static org.lwjgl.opengl.GL20.GL_SHADER_TYPE;
 import static org.lwjgl.opengl.GL20.GL_VERTEX_SHADER;
+import static org.lwjgl.opengl.GL32.GL_GEOMETRY_SHADER;
 import static org.lwjgl.opengl.GL40.GL_TESS_CONTROL_SHADER;
 import static org.lwjgl.opengl.GL40.GL_TESS_EVALUATION_SHADER;
 import static org.lwjgl.opengl.GL20.glAttachShader;
@@ -36,6 +37,9 @@ public class ShaderFactory {
 	}
 	public static int colorShadersProgram() {
 		return new ShaderFactory("res/shaders/", "color").PROGRAM;
+	}
+	public static int tessShadersProgram() {
+		return new ShaderFactory("res/shaders/", "simple").PROGRAM;
 	}
 
 	public ShaderFactory(String shaderProgramDirectory, String shaderName) {
@@ -115,6 +119,7 @@ public class ShaderFactory {
 	public static final String TCS = "tcs";
 	public static final String TES = "tes";
 	public static final String FS =  "fs";
+	public static final String GS =  "gs";
 	
 	
 	private FilenameFilter filter(String shaderName) {
@@ -145,6 +150,7 @@ public class ShaderFactory {
 		map.put(GL_TESS_CONTROL_SHADER, TCS);
 		map.put(GL_TESS_EVALUATION_SHADER, TES);
 		map.put(GL_FRAGMENT_SHADER, FS);
+		map.put(GL_GEOMETRY_SHADER, GS);
 		
 		return map;
 	}
@@ -154,6 +160,7 @@ public class ShaderFactory {
 		map.put(TCS, GL_TESS_CONTROL_SHADER);
 		map.put(TES, GL_TESS_EVALUATION_SHADER);
 		map.put(FS, GL_FRAGMENT_SHADER);
+		map.put(GS, GL_GEOMETRY_SHADER);
 		return map;
 	}
 

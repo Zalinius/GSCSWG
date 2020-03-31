@@ -22,6 +22,7 @@ import org.joml.Vector4f;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
+import org.lwjgl.opengl.GL40;
 
 public class RenderableObject {
 
@@ -37,6 +38,7 @@ public class RenderableObject {
 
 	public static final RenderableObject LINE = sampleLine();
 	public static final RenderableObject QUAD = setupQuad();
+	public static final RenderableObject MESH_TRIANGLE = setupMeshTriangle();
 	public static final RenderableObject COLOR_QUAD = setupColorQuad();
 	public static final RenderableObject BEZIER_SPLINE = sampleSplineCurve();
 	public static final RenderableObject AXES_COLORED = coloredAxes();
@@ -44,7 +46,7 @@ public class RenderableObject {
 	
 	private static RenderableObject setupVertices(float[] vertices, int renderMode) {
 		int vao = glGenVertexArrays();
-		System.out.println("vao:" + vao + " floats:" + vertices.length);
+
 		glBindVertexArray(vao);
 				
 		int vbo = glGenBuffers();
@@ -63,7 +65,6 @@ public class RenderableObject {
 
 		int vao = glGenVertexArrays();
 		glBindVertexArray(vao);
-		System.out.println("vao:" + vao + " floats:" + vertices.length);
 
 		int[] vbos = new int[2];
 		glGenBuffers(vbos);;
@@ -78,7 +79,6 @@ public class RenderableObject {
 	}
 	
 	private static void setupVBO(int vbo, float[] data, int attributeIndex, int dimensionality) {
-		System.out.println("VBO : " + vbo + " " + data.length);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		FloatBuffer buffer = BufferUtils.createFloatBuffer(data.length);
 		buffer.put(data);
@@ -91,7 +91,6 @@ public class RenderableObject {
 	}
 	
 	private static RenderableObject coloredAxes() {
-		System.out.print("Axes: ");
 		float[] vertices = {
 				//X - axis
 				0.0f, 0.0f, 0.0f,
@@ -121,7 +120,6 @@ public class RenderableObject {
 	
 	
 	private static RenderableObject sampleSplineCurve() {
-		System.out.print("Spline: ");
 		Vector3f p1 = new Vector3f(0.0f,0.0f,0.0f);
 		Vector3f p2 = new Vector3f(1.0f,0.0f,0.0f);
 		Vector3f p3 = new Vector3f(1.0f,1.0f,1.0f);
@@ -130,7 +128,6 @@ public class RenderableObject {
 	}
 	
 	private static RenderableObject sampleLine() {
-		System.out.print("Line:");
 		Vector3f p1 = new Vector3f(0,0,0);
 		Vector3f p2 = new Vector3f(1,0.5f,0);
 		Vector3f p3 = new Vector3f(2,2,0);
@@ -156,7 +153,6 @@ public class RenderableObject {
 
 
 	private static RenderableObject setupQuad() {
-		System.out.print("Quad: ");
 		float[] vertices = {
 				// Left bottom triangle
 				-0.5f, 0.5f, 0f,
@@ -170,8 +166,17 @@ public class RenderableObject {
 		return setupVertices(vertices, GL11.GL_TRIANGLES);
 	}
 	
+	private static RenderableObject setupMeshTriangle() {
+		float[] vertices = {
+				// Left bottom triangle
+				0.0f, 0.5f, 0f,
+				-0.5f, -0.5f, 0f,
+				0.5f, -0.5f, 0f
+		};
+		return setupVertices(vertices, GL40.GL_PATCHES);
+	}
+	
 	private static RenderableObject setupColorQuad() {
-		System.out.print("Color quad: ");
 		float[] vertices = {
 				// Left bottom triangle
 				-0.5f, 0.5f, 0f,
