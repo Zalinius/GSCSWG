@@ -14,6 +14,7 @@ import java.nio.FloatBuffer;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 import org.joml.Matrix4f;
 import org.joml.Matrix4x3f;
@@ -41,7 +42,7 @@ public class RenderableObject {
 	public static final RenderableObject MESH_TRIANGLE = setupMeshTriangle();
 	public static final RenderableObject COLOR_QUAD = setupColorQuad();
 	public static final RenderableObject BEZIER_SPLINE = sampleSplineCurve();
-	public static final RenderableObject BEZIER_SPLINE_POINTS = splineCurvePoints();
+	public static final RenderableObject BEZIER_SPLINE_POINTS = samplec1SmoothSplineCurve();
 	public static final RenderableObject AXES_COLORED = coloredAxes();
 	
 	
@@ -123,14 +124,78 @@ public class RenderableObject {
 		Vector3f p1 = new Vector3f(0.1f,0.1f,0.1f);
 		Vector3f p2 = new Vector3f(1.1f,0.1f,0.1f);
 		Vector3f p3 = new Vector3f(1.1f,1.1f,1.1f);
-		Vector3f p4 = new Vector3f(0.1f,1.1f,1.1f);
+		Vector3f p5 = new Vector3f(0.1f,2.1f,1.1f);
+		Vector3f p6 = new Vector3f(1.1f,2.1f,1.1f);
+		Vector3f p7 = new Vector3f(1.1f,2.1f,3.1f);
+		
+		Vector3f p4 = new Vector3f().add(p3).add(p5).mul(0.5f);
+
 		List<Vector3f> points = new ArrayList<>();
 		points.add(p1);
 		points.add(p2);
 		points.add(p3);
 		points.add(p4);
+		points.add(p4);
+		points.add(p5);
+		points.add(p6);
+		points.add(p7);
 		return setupPoints(points, GL40.GL_PATCHES);
 	}
+	
+	public static RenderableObject samplec1SmoothSplineCurve(){
+		List<Vector3f> points = new ArrayList<>();
+		points.add(new Vector3f(0,0,0));
+		points.add(new Vector3f(0,1,0));
+		points.add(new Vector3f(0,1,1));
+		
+		points.add(new Vector3f(1,1,2));
+		points.add(new Vector3f(1,2,3));
+		
+		points.add(new Vector3f(4,2,1));
+		points.add(new Vector3f(3,2,3));
+		
+		points.add(new Vector3f(4,2,2));
+		points.add(new Vector3f(2,2,0));
+		
+		points.add(new Vector3f(1,1,1));
+		points.add(new Vector3f(0,-1,0));
+		points.add(new Vector3f(0,0,0));
+
+		return c1SmoothSplineCurve(points);
+	}
+	
+	public static RenderableObject c1SmoothSplineCurve(List<Vector3f> points) {
+		int n = points.size();
+		if(n < 4 || n%2 != 0 ) {
+			throw new RuntimeException("Wrong number of points to make curve. Must be even and at least 4");
+		}
+		
+		
+		if(n == 4) { //No generated points
+			return setupPoints(points, GL40.GL_PATCHES);
+		}
+		
+		List<Vector3f> smoothedPoints = new ArrayList<>(points);
+		
+		int newIndex = 0;
+		System.out.println("Creating smooth curve");
+		for(ListIterator<Vector3f> it = smoothedPoints.listIterator(); it.hasNext();) {
+			Vector3f point = it.next();
+			newIndex++;
+			if(newIndex % 4 == 3 && newIndex != 0 && newIndex != (2*points.size() -5)) {
+				Vector3f collinearPoint = new Vector3f().add(point).add(smoothedPoints.get(newIndex)).mul(0.5f);
+				it.add(collinearPoint);
+				it.add(collinearPoint);
+				System.out.println(newIndex + ": " + collinearPoint);
+				newIndex++;
+				System.out.println(newIndex + ": " + collinearPoint);
+				newIndex++;
+			}
+		}
+		
+		return setupPoints(smoothedPoints, GL40.GL_PATCHES);
+	}
+
 	
 	private static RenderableObject sampleSplineCurve() {
 		Vector3f p1 = new Vector3f(0.0f,0.0f,0.0f);
