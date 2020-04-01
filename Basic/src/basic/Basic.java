@@ -98,7 +98,6 @@ public class Basic {
 		RenderableObject axes = RenderableObject.AXES_COLORED;
 		RenderableObject model = RenderableObject.BEZIER_SPLINE_POINTS;
 		RenderableObject sample = RenderableObject.BEZIER_SPLINE;
-		System.out.println(model.VERTICES);
 
 		//Set up transformation matrices
 		modelMatrix = new Matrix4f();
@@ -253,7 +252,7 @@ public class Basic {
 				System.out.println("Rawr!");
 			} else if (key == GLFW_KEY_E && action == GLFW_RELEASE){
 				tesselation *= 2;
-				tesselation = Math.min(64, tesselation);
+				tesselation = Math.min(OpenGLConstants.maximumTesselationLevel(), tesselation);
 			} else if (key == GLFW_KEY_Q && action == GLFW_RELEASE){
 				tesselation /= 2;
 				tesselation = Math.max(1, tesselation);
@@ -271,7 +270,7 @@ public class Basic {
 	private int tesselation;
 	private void initializeTesselation() {
 		//4 for bezier splines
-		glPatchParameteri(GL_PATCH_VERTICES, 4);
+		glPatchParameteri(OpenGLConstants.patchesTarget, 4);
 		tesselation = 16;
 	}
 
