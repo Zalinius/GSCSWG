@@ -69,8 +69,6 @@ public class ShaderFactory {
 		}
 		
 		PROGRAM = compileProgram(compiledShaders);
-
-		System.out.println("Created shader program " + shaderName + ", with " + compiledShaders.size() + " shaders.");
 	}
 	
 	private int compileProgram(List<Integer> shaders) {

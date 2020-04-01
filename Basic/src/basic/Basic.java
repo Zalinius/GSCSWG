@@ -98,7 +98,6 @@ public class Basic {
 		RenderableObject axes = RenderableObject.AXES_COLORED;
 		RenderableObject model = RenderableObject.BEZIER_SPLINE_POINTS;
 		RenderableObject sample = RenderableObject.BEZIER_SPLINE;
-		System.out.println(model.VERTICES);
 
 		//Set up transformation matrices
 		modelMatrix = new Matrix4f();
