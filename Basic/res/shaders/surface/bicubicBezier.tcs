@@ -4,7 +4,7 @@
 uniform float tessLevel;
 
 //output patch size
-layout(vertices = 4) out;
+layout(vertices = 16) out;
 
 //Built-in variables
 
@@ -34,7 +34,13 @@ out gl_PerVertex
  
 void main(void)
 {
-  gl_TessLevelOuter[0] = 1;  //Iso-lines
-  gl_TessLevelOuter[1] = tessLevel; //many wide, 1 high
+  gl_TessLevelOuter[0] = tessLevel;
+  gl_TessLevelOuter[1] = tessLevel;
+  gl_TessLevelOuter[2] = tessLevel;
+  gl_TessLevelOuter[3] = tessLevel;
+  
+  gl_TessLevelInner[0] = tessLevel;
+  gl_TessLevelInner[1] = tessLevel;
+  
   output_to_TES[gl_InvocationID].gl_Position = vertex_in[gl_InvocationID].gl_Position;
 }

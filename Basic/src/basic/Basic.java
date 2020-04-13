@@ -270,7 +270,7 @@ public class Basic {
 	private int tesselation;
 	private void initializeTesselation() {
 		//4 for bezier splines
-		glPatchParameteri(OpenGLConstants.patchesTarget, 4);
+		glPatchParameteri(OpenGLConstants.patchesTarget, 16);
 		tesselation = 16;
 	}
 
