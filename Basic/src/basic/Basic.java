@@ -6,7 +6,6 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.system.*;
 
 import model.RenderableObject;
-import shader.ShaderFactory;
 
 import org.joml.Matrix4f;
 
@@ -94,11 +93,7 @@ public class Basic {
 
 
 	private void loop() {
-
-		int cProgram = ShaderFactory.colorShadersProgram();
-		int bProgram = ShaderFactory.splineCurveTessShadersProgram();
-		int oldProgram = ShaderFactory.basicShadersProgram();
-		int activeProgram = cProgram;
+		int activeProgram;
 		RenderableObject axes = RenderableObject.AXES_COLORED;
 		RenderableObject model = RenderableObject.BEZIER_SPLINE_POINTS;
 		RenderableObject sample = RenderableObject.BEZIER_SPLINE;
@@ -121,7 +116,7 @@ public class Basic {
 			// Frame time calculation
 
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
-			activeProgram = bProgram;
+			activeProgram = model.shaderProgram();
 			glUseProgram(activeProgram);
 
 			glBindVertexArray(model.VAO);
@@ -149,7 +144,7 @@ public class Basic {
 			checkError("model draw call");
 
 
-			activeProgram = cProgram;
+			activeProgram = axes.shaderProgram();
 			glUseProgram(activeProgram);
 
 			glBindVertexArray(axes.VAO);
@@ -174,7 +169,7 @@ public class Basic {
 			
 			
 			
-			activeProgram = oldProgram;
+			activeProgram = sample.shaderProgram();
 			glUseProgram(activeProgram);
 
 			glBindVertexArray(sample.VAO);

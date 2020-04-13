@@ -25,16 +25,21 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL40;
 
+import shader.Shader;
+import shader.ShaderFactory;
+
 public class RenderableObject {
 
 	public final int VAO;
 	public final int VERTICES;
 	public final int RENDER_MODE;
+	private Shader attachedShader;
 
-	public RenderableObject(int VAO, int VERTICES, int RENDER_MODE) {
+	public RenderableObject(int VAO, int VERTICES, int RENDER_MODE, Shader shaderProgram) {
 		this.VAO = VAO;
 		this.VERTICES = VERTICES;
 		this.RENDER_MODE = RENDER_MODE;
+		this.attachedShader = shaderProgram;
 	}
 
 	public static final RenderableObject LINE = sampleLine();
@@ -45,8 +50,12 @@ public class RenderableObject {
 	public static final RenderableObject BEZIER_SPLINE_POINTS = samplec1SmoothSplineCurve();
 	public static final RenderableObject AXES_COLORED = coloredAxes();
 	
+	public int shaderProgram() {
+		return attachedShader.SHADER_PROGRAM;
+	}
 	
-	private static RenderableObject setupVertices(float[] vertices, int renderMode) {
+	
+	private static RenderableObject setupVertices(float[] vertices, int renderMode, Shader shader) {
 		int vao = glGenVertexArrays();
 
 		glBindVertexArray(vao);
@@ -57,7 +66,7 @@ public class RenderableObject {
 		int vertexCount = vertices.length / 3;
 		glBindVertexArray(0);
 
-		return new RenderableObject(vao, vertexCount, renderMode);
+		return new RenderableObject(vao, vertexCount, renderMode, shader);
 	}
 	
 	private static RenderableObject setupVerticesWithColors(float[] vertices, float[] colors, int renderMode) {
@@ -77,7 +86,7 @@ public class RenderableObject {
 		glBindVertexArray(0);
 		int vertexCount = vertices.length / 3;
 
-		return new RenderableObject(vao, vertexCount, renderMode);
+		return new RenderableObject(vao, vertexCount, renderMode, ShaderFactory.COLOR);
 	}
 	
 	private static void setupVBO(int vbo, float[] data, int attributeIndex, int dimensionality) {
@@ -139,7 +148,7 @@ public class RenderableObject {
 		points.add(p5);
 		points.add(p6);
 		points.add(p7);
-		return setupPoints(points, GL40.GL_PATCHES);
+		return setupPoints(points, GL40.GL_PATCHES,ShaderFactory.BEZIER_CURVE);
 	}
 	
 	public static RenderableObject samplec1SmoothSplineCurve(){
@@ -172,7 +181,7 @@ public class RenderableObject {
 		
 		
 		if(n == 4) { //No generated points
-			return setupPoints(points, GL40.GL_PATCHES);
+			return setupPoints(points, GL40.GL_PATCHES, ShaderFactory.BEZIER_CURVE);
 		}
 		
 		List<Vector3f> smoothedPoints = new ArrayList<>(points);
@@ -193,7 +202,7 @@ public class RenderableObject {
 			}
 		}
 		
-		return setupPoints(smoothedPoints, GL40.GL_PATCHES);
+		return setupPoints(smoothedPoints, GL40.GL_PATCHES, ShaderFactory.BEZIER_CURVE);
 	}
 
 	
@@ -225,7 +234,7 @@ public class RenderableObject {
 		points.add(p7);
 		points.add(p8);
 		points.add(p9);
-		return setupPoints(points, GL11.GL_LINE_STRIP);
+		return setupPoints(points, GL11.GL_LINE_STRIP, ShaderFactory.BASIC);
 	}
 
 
@@ -241,7 +250,7 @@ public class RenderableObject {
 				0.5f, 0.5f, 0f,
 				-0.5f, 0.5f, 0f
 		};
-		return setupVertices(vertices, GL11.GL_TRIANGLES);
+		return setupVertices(vertices, GL11.GL_TRIANGLES, ShaderFactory.BASIC);
 	}
 	
 	private static RenderableObject setupMeshTriangle() {
@@ -251,7 +260,7 @@ public class RenderableObject {
 				-0.5f, -0.5f, 0f,
 				0.5f, -0.5f, 0f
 		};
-		return setupVertices(vertices, GL40.GL_PATCHES);
+		return setupVertices(vertices, GL40.GL_PATCHES, ShaderFactory.TRIANGLE_TESS);
 	}
 	
 	private static RenderableObject setupColorQuad() {
@@ -298,10 +307,10 @@ public class RenderableObject {
 			//System.out.println(i + ": " + vertexData[i] + ", " + vertexData[i+1] + ", " + vertexData[i+2]);
 		}
 
-		return setupPoints(points, GL11.GL_LINE_STRIP);
+		return setupPoints(points, GL11.GL_LINE_STRIP, ShaderFactory.BASIC);
 	}
 	
-	public static RenderableObject setupPoints(List<Vector3f> points, int renderMode) {
+	public static RenderableObject setupPoints(List<Vector3f> points, int renderMode, Shader shader) {
 		float[] vertexData = new float[points.size() * 3];
 		
 		int vertexDataIndex = 0;
@@ -314,7 +323,7 @@ public class RenderableObject {
 			vertexData[vertexDataIndex+2] = point.z;
 		}
 		
-		return setupVertices(vertexData, renderMode);
+		return setupVertices(vertexData, renderMode, shader);
 	}
 
 }
