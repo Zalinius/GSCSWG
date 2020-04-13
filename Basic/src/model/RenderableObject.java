@@ -213,7 +213,6 @@ public class RenderableObject {
 		List<Vector3f> smoothedPoints = new ArrayList<>(points);
 
 		int newIndex = 0;
-		System.out.println("Creating smooth curve");
 		for(ListIterator<Vector3f> it = smoothedPoints.listIterator(); it.hasNext();) {
 			Vector3f point = it.next();
 			newIndex++;
@@ -221,9 +220,7 @@ public class RenderableObject {
 				Vector3f collinearPoint = new Vector3f().add(point).add(smoothedPoints.get(newIndex)).mul(0.5f);
 				it.add(collinearPoint);
 				it.add(collinearPoint);
-				System.out.println(newIndex + ": " + collinearPoint);
 				newIndex++;
-				System.out.println(newIndex + ": " + collinearPoint);
 				newIndex++;
 			}
 		}
@@ -281,12 +278,18 @@ public class RenderableObject {
 	private static RenderableObject bezierPatchSurface() {
 		Grid<Vector3f> patch = bezierPatchPoints();
 		List<Vector3f> points = new ArrayList<>(16);
+		
+		for(int i = 0; i != patch.size(); ++i) {
+			points.add(null);
+		}
+		System.out.println("Points: " + points.size());
 
 		Iterator<Vector2i> it = patch.points();
 		while(it.hasNext()) {
 			Vector2i coordinate = it.next();
 			int linearIndex = coordinate.x * 4 + coordinate.y;
 			points.set(linearIndex, patch.get(coordinate));
+			System.out.println("Setting " + linearIndex + "(" + coordinate.x + "," + coordinate.y + ")" + " to " + patch.get(coordinate) );
 		}
 		
 		

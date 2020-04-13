@@ -31,7 +31,6 @@ out gl_PerVertex {
 
 void main()
 { 
-/*
   float u = gl_TessCoord[0].x;
   float v = gl_TessCoord[0].y;
   vec4 uParameter = vec4(1, u, u*u, u*u*u);
@@ -58,9 +57,10 @@ void main()
   bezier[3][2] = -3;
   bezier[3][3] = 1;
   
-  gl_Position.x = (uParameter * transpose(bezier) * positionMatrixX * bezier * vParameter).x;
-  gl_Position.y = (uParameter * transpose(bezier) * positionMatrixY * bezier * vParameter).x;
-  gl_Position.z = (uParameter * transpose(bezier) * positionMatrixZ * bezier * vParameter).x;
-*/
+  gl_Position.x = dot(uParameter, transpose(bezier) * positionMatrixX * bezier * vParameter);
+  gl_Position.y = dot(uParameter, transpose(bezier) * positionMatrixY * bezier * vParameter);
+  gl_Position.z = dot(uParameter, transpose(bezier) * positionMatrixZ * bezier * vParameter);
+  gl_Position.w = 1;
+
   gl_Position = pm*vm*mm*gl_Position;
 }

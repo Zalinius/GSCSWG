@@ -88,7 +88,6 @@ public class Basic {
 
 		System.out.println("LWJGL:  " + Version.getVersion());
 		System.out.println("OpenGL: " + glGetInteger(GL_MAJOR_VERSION) + "." + glGetInteger(GL_MINOR_VERSION));
-		System.out.println(OpenGLConstants.maximumPatchSize());
 	}
 
 
@@ -96,9 +95,9 @@ public class Basic {
 	private void loop() {
 		int activeProgram;
 		RenderableObject axes = RenderableObject.AXES_COLORED;
-		RenderableObject model = RenderableObject.BEZIER_SPLINE_POINTS;
+		RenderableObject model = RenderableObject.BEZIER_PATCH_SURFACE;
 		RenderableObject sample = RenderableObject.BEZIER_PATCH_POINTS;
-		glPointSize(10);
+		glPointSize(5);
 
 		//Set up transformation matrices
 		modelMatrix = new Matrix4f();
@@ -271,8 +270,8 @@ public class Basic {
 	private int tesselation;
 	private void initializeTesselation() {
 		//4 for bezier splines
-		glPatchParameteri(OpenGLConstants.patchesTarget, 4);
-		tesselation = 16;
+		glPatchParameteri(OpenGLConstants.patchesTarget, 16);
+		tesselation = 4;
 	}
 
 }
