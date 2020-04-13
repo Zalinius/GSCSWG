@@ -25,6 +25,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL40;
 
+import basic.Grid;
 import shader.Shader;
 import shader.ShaderFactory;
 
@@ -49,6 +50,7 @@ public class RenderableObject {
 	public static final RenderableObject BEZIER_SPLINE = sampleSplineCurve();
 	public static final RenderableObject BEZIER_SPLINE_POINTS = samplec1SmoothSplineCurve();
 	public static final RenderableObject AXES_COLORED = coloredAxes();
+	public static final RenderableObject BEZIER_PATCH_POINTS = bezierPatchAsPoints();
 	
 	public int shaderProgram() {
 		return attachedShader.SHADER_PROGRAM;
@@ -151,6 +153,28 @@ public class RenderableObject {
 		return setupPoints(points, GL40.GL_PATCHES,ShaderFactory.BEZIER_CURVE);
 	}
 	
+	private static Grid<Vector3f> bezierPatchPoints() {
+		Grid<Vector3f> patch = new Grid<Vector3f>();
+		final int WIDTH = 4;
+		for(int i = 0; i != WIDTH; ++i) {
+			for(int j = 0; j != WIDTH; ++j) {
+				int height;
+				if((i == 1 || i == 2) && (j == 1 || j == 2)){
+					height = -1;
+				}
+				else {
+					height = 0;
+				}
+				
+				patch.put(i, j, new Vector3f(i, j, height));
+			}
+		}
+		
+		return patch;
+	}
+	
+	
+	
 	public static RenderableObject samplec1SmoothSplineCurve(){
 		List<Vector3f> points = new ArrayList<>();
 		points.add(new Vector3f(0,0,0));
@@ -235,6 +259,21 @@ public class RenderableObject {
 		points.add(p8);
 		points.add(p9);
 		return setupPoints(points, GL11.GL_LINE_STRIP, ShaderFactory.BASIC);
+	}
+	
+	private static RenderableObject setupPointCloud(List<Vector3f> points) {
+		return setupPoints(points, GL11.GL_POINTS, ShaderFactory.BASIC);
+	}
+	
+	private static RenderableObject bezierPatchAsPoints() {
+		Grid<Vector3f> patch = bezierPatchPoints();
+		List<Vector3f> points = new ArrayList<>();
+		Iterator<Vector3f> it = patch.elements();
+		while (it.hasNext()) {
+			points.add(it.next());
+		}
+		
+		return setupPointCloud(points);
 	}
 
 

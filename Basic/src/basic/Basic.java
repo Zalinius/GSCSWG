@@ -96,7 +96,8 @@ public class Basic {
 		int activeProgram;
 		RenderableObject axes = RenderableObject.AXES_COLORED;
 		RenderableObject model = RenderableObject.BEZIER_SPLINE_POINTS;
-		RenderableObject sample = RenderableObject.BEZIER_SPLINE;
+		RenderableObject sample = RenderableObject.BEZIER_PATCH_POINTS;
+		glPointSize(10);
 
 		//Set up transformation matrices
 		modelMatrix = new Matrix4f();
