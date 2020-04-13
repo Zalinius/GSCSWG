@@ -6,6 +6,7 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.system.*;
 
 import model.RenderableObject;
+import shader.ShaderFactory;
 
 import org.joml.Matrix4f;
 
