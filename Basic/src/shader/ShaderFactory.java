@@ -1,4 +1,4 @@
-package basic;
+package shader;
 
 import static org.lwjgl.opengl.GL20.GL_COMPILE_STATUS;
 import static org.lwjgl.opengl.GL20.GL_FRAGMENT_SHADER;
@@ -28,27 +28,31 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import model.OBJLoader;
+
 public class ShaderFactory {
 	
-	public final int PROGRAM;
+	public static final Shader BASIC = new Shader(basicShadersProgram());
+	public static final Shader COLOR = new Shader(colorShadersProgram());
+	public static final CurveShader BEZIER_CURVE = new CurveShader(bezierSplineShadersProgram());
 	
-	public static int basicShadersProgram() {
-		return new ShaderFactory("res/shaders/", "basic").PROGRAM;
+	public static final SurfaceShader TRIANGLE_TESS = new SurfaceShader(curveTessShadersProgram());
+	
+	private static int basicShadersProgram() {
+		return makeShader(new File("res/shaders/"), "basic");
 	}
-	public static int colorShadersProgram() {
-		return new ShaderFactory("res/shaders/", "color").PROGRAM;
+	private static int colorShadersProgram() {
+		return makeShader(new File("res/shaders/"), "color");
 	}
-	public static int tessShadersProgram() {
-		return new ShaderFactory("res/shaders/", "simple").PROGRAM;
+	private static int curveTessShadersProgram() {
+		return makeShader(new File("res/shaders/"), "simple");
 	}
-	public static int splineCurveTessShadersProgram() {
-		return new ShaderFactory("res/shaders/", "bezier").PROGRAM;
+	private static int bezierSplineShadersProgram() {
+		return makeShader(new File("res/shaders/"), "bezier");
 	}
 
-	public ShaderFactory(String shaderProgramDirectory, String shaderName) {
-		this(new File(shaderProgramDirectory), shaderName);
-	}
-	public ShaderFactory(File shaderProgramDirectory, String shaderName) {
+
+	private static int makeShader(File shaderProgramDirectory, String shaderName) {
 		if(!shaderProgramDirectory.isDirectory()) {
 			throw new RuntimeException("Not a directory");
 		}
@@ -68,10 +72,10 @@ public class ShaderFactory {
 			compiledShaders.add(compileShader(shaderSource, shaderType));
 		}
 		
-		PROGRAM = compileProgram(compiledShaders);
+		return compileProgram(compiledShaders);
 	}
 	
-	private int compileProgram(List<Integer> shaders) {
+	private static int compileProgram(List<Integer> shaders) {
 		int program = glCreateProgram();
 		for (Iterator<Integer> it = shaders.iterator(); it.hasNext();) {
 			Integer shader = it.next();
@@ -92,7 +96,7 @@ public class ShaderFactory {
         return program;
 	}
 	
-	private void shaderErrors(int shader) {
+	private static void shaderErrors(int shader) {
         int compiled = glGetShaderi(shader, GL_COMPILE_STATUS);
         String shaderLog = glGetShaderInfoLog(shader);
         if (shaderLog.trim().length() > 0) {
@@ -104,7 +108,7 @@ public class ShaderFactory {
         }
 	}
 	
-	private int compileShader(String source, int type) {
+	private static int compileShader(String source, int type) {
 		int shader = glCreateShader(type);
 		
 		glShaderSource(shader, source);
@@ -123,7 +127,7 @@ public class ShaderFactory {
 	public static final String GS =  "gs";
 	
 	
-	private FilenameFilter filter(String shaderName) {
+	private static FilenameFilter filter(String shaderName) {
 		return new FilenameFilter() {
 			
 			@Override
