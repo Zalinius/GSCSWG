@@ -4,6 +4,9 @@ import org.lwjgl.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.*;
+
+import model.RenderableObject;
+
 import org.joml.Matrix4f;
 
 import java.nio.*;

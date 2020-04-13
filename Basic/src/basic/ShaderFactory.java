@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import model.OBJLoader;
+
 public class ShaderFactory {
 	
 	public final int PROGRAM;
