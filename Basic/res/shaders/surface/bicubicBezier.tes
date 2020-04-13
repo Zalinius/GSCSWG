@@ -1,0 +1,66 @@
+#version 430 core
+
+uniform mat4 mm;
+uniform mat4 vm;
+uniform mat4 pm;
+
+//TES options
+layout(quads, equal_spacing) in;
+
+in gl_PerVertex
+{
+  vec4 gl_Position;
+  float gl_PointSize;
+  float gl_ClipDistance[];
+} input_from_TCS[];
+
+//Built-in inputs
+in vec3 gl_TessCoord[];
+//Each TessCoord received is of the form <x,y> where x is 0, and y is on [0,1].
+//We'll be using x and y as our spline surface parameters
+
+in int gl_PatchVerticesIn[];
+in int gl_PrimitiveID[];
+
+//Built-in outputs
+out gl_PerVertex {
+  vec4 gl_Position;
+  float gl_PointSize;
+  float gl_ClipDistance[];
+};
+
+void main()
+{ 
+  float u = gl_TessCoord[0].x;
+  float v = gl_TessCoord[0].y;
+  vec4 uParameter = vec4(1, u, u*u, u*u*u);
+  vec4 vParameter = vec4(1, v, v*v, v*v*v);
+  
+  mat4 positionMatrixX;
+  mat4 positionMatrixY;
+  mat4 positionMatrixZ;
+  for(int i = 0; i != 16; ++i){
+    positionMatrixX[i/4][i%4] = input_from_TCS[i].gl_Position.x;
+    positionMatrixY[i/4][i%4] = input_from_TCS[i].gl_Position.y;
+    positionMatrixZ[i/4][i%4] = input_from_TCS[i].gl_Position.z;
+  }
+  
+  mat4 bezier;
+  bezier[0][0] = 1;
+  bezier[1][0] = -3;
+  bezier[2][0] = 3;
+  bezier[3][0] = -1;
+  bezier[1][1] = 3;
+  bezier[2][1] = -6;
+  bezier[3][1] = 3;
+  bezier[2][2] = 3;
+  bezier[3][2] = -3;
+  bezier[3][3] = 1;
+  
+  gl_Position.x = dot(uParameter, transpose(bezier) * positionMatrixX * bezier * vParameter);
+  gl_Position.y = dot(uParameter, transpose(bezier) * positionMatrixY * bezier * vParameter);
+  gl_Position.z = dot(uParameter, transpose(bezier) * positionMatrixZ * bezier * vParameter);
+  gl_Position.w = 1;
+
+  gl_Position = pm*vm*mm*gl_Position;
+}
