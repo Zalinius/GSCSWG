@@ -36,7 +36,10 @@ public class Grid<E> {
 	}
 	
 	public E get(int i, int j) {
-		return grid.get(new Vector2i(i, j));
+		return get(new Vector2i(i, j));
+	}
+	public E get(Vector2i coordinates) {
+		return grid.get(coordinates);
 	}
 	
 	

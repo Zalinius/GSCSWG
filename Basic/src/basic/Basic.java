@@ -88,6 +88,7 @@ public class Basic {
 
 		System.out.println("LWJGL:  " + Version.getVersion());
 		System.out.println("OpenGL: " + glGetInteger(GL_MAJOR_VERSION) + "." + glGetInteger(GL_MINOR_VERSION));
+		System.out.println(OpenGLConstants.maximumPatchSize());
 	}
 
 
@@ -270,7 +271,7 @@ public class Basic {
 	private int tesselation;
 	private void initializeTesselation() {
 		//4 for bezier splines
-		glPatchParameteri(OpenGLConstants.patchesTarget, 16);
+		glPatchParameteri(OpenGLConstants.patchesTarget, 4);
 		tesselation = 16;
 	}
 

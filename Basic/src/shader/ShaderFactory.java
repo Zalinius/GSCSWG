@@ -31,9 +31,11 @@ import java.util.Set;
 import model.OBJLoader;
 
 public class ShaderFactory {
-	
+	public static final SurfaceShader BEZIER_SURFACE = new SurfaceShader(bezierPatchShadersProgram());
+
 	public static final Shader BASIC = new Shader(basicShadersProgram());
 	public static final Shader COLOR = new Shader(colorShadersProgram());
+	
 	public static final CurveShader BEZIER_CURVE = new CurveShader(bezierSplineShadersProgram());
 	
 	public static final SurfaceShader TRIANGLE_TESS = new SurfaceShader(curveTessShadersProgram());
@@ -49,6 +51,9 @@ public class ShaderFactory {
 	}
 	private static int bezierSplineShadersProgram() {
 		return makeShader(new File("res/shaders/"), "bezier");
+	}
+	private static int bezierPatchShadersProgram() {
+		return makeShader(new File("res/shaders/surface/"), "bicubicBezier");
 	}
 
 
@@ -69,13 +74,13 @@ public class ShaderFactory {
 			File file = shaderFiles[i];
 			String shaderSource = OBJLoader.readEntireFile(file);
 			int shaderType = shaderGLTypes().get(file.getName().substring(file.getName().lastIndexOf('.')+1));
-			compiledShaders.add(compileShader(shaderSource, shaderType));
+			compiledShaders.add(compileShader(shaderSource, shaderName, shaderType));
 		}
 		
-		return compileProgram(compiledShaders);
+		return compileProgram(compiledShaders, shaderName);
 	}
 	
-	private static int compileProgram(List<Integer> shaders) {
+	private static int compileProgram(List<Integer> shaders, String shaderName) {
 		int program = glCreateProgram();
 		for (Iterator<Integer> it = shaders.iterator(); it.hasNext();) {
 			Integer shader = it.next();
@@ -87,20 +92,20 @@ public class ShaderFactory {
         int linked = glGetProgrami(program, GL_LINK_STATUS);
         String programLog = glGetProgramInfoLog(program);
         if (programLog.trim().length() > 0) {
-            System.err.println(programLog);
+            System.err.println("Link error: " + programLog);
         }
         if (linked == 0) {
-            throw new AssertionError("Could not link program");
+            throw new AssertionError("Could not link program " + '"' + shaderName + '"');
         }
         
         return program;
 	}
 	
-	private static void shaderErrors(int shader) {
+	private static void shaderErrors(int shader, String name) {
         int compiled = glGetShaderi(shader, GL_COMPILE_STATUS);
         String shaderLog = glGetShaderInfoLog(shader);
         if (shaderLog.trim().length() > 0) {
-        	System.err.println("Shader Type: ." + shaderTypeExtensions().get(glGetShaderi(shader, GL_SHADER_TYPE)));
+        	System.err.println("Shader: " + name + "." + shaderTypeExtensions().get(glGetShaderi(shader, GL_SHADER_TYPE)));
             System.err.println(shaderLog);
         }
         if (compiled == 0) {
@@ -108,12 +113,12 @@ public class ShaderFactory {
         }
 	}
 	
-	private static int compileShader(String source, int type) {
+	private static int compileShader(String source, String name, int type) {
 		int shader = glCreateShader(type);
 		
 		glShaderSource(shader, source);
 		glCompileShader(shader);
-		shaderErrors(shader);
+		shaderErrors(shader, name);
 		
         return shader;
 	}
