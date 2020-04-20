@@ -162,7 +162,7 @@ public class RenderableObject {
 			for(int j = 0; j != WIDTH; ++j) {
 				int height;
 				if((i == 1 || i == 2) && (j == 1 || j == 2)){
-					height = -1;
+					height = -3;
 				}
 				else {
 					height = 0;
@@ -282,14 +282,12 @@ public class RenderableObject {
 		for(int i = 0; i != patch.size(); ++i) {
 			points.add(null);
 		}
-		System.out.println("Points: " + points.size());
 
 		Iterator<Vector2i> it = patch.points();
 		while(it.hasNext()) {
 			Vector2i coordinate = it.next();
 			int linearIndex = coordinate.x * 4 + coordinate.y;
 			points.set(linearIndex, patch.get(coordinate));
-			System.out.println("Setting " + linearIndex + "(" + coordinate.x + "," + coordinate.y + ")" + " to " + patch.get(coordinate) );
 		}
 		
 		

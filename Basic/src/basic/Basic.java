@@ -248,8 +248,6 @@ public class Basic {
 		glfwSetKeyCallback(window, (window, key, scancode, action, mods) -> {
 			if ( key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE ) {
 				glfwSetWindowShouldClose(window, true); // We will detect this in the rendering loop
-			} else if(key == GLFW_KEY_SPACE && action == GLFW_RELEASE) {
-				System.out.println("Rawr!");
 			} else if (key == GLFW_KEY_E && action == GLFW_RELEASE){
 				tesselation *= 2;
 				tesselation = Math.min(OpenGLConstants.maximumTesselationLevel(), tesselation);
