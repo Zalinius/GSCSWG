@@ -12,6 +12,7 @@ import static org.lwjgl.opengl.GL30.glGenVertexArrays;
 
 import java.nio.FloatBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
@@ -26,6 +27,7 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL40;
 
+import basic.BicubicBezierSurface;
 import basic.Grid;
 import shader.Shader;
 import shader.ShaderFactory;
@@ -53,6 +55,9 @@ public class RenderableObject {
 	public static final RenderableObject AXES_COLORED = coloredAxes();
 	public static final RenderableObject BEZIER_PATCH_POINTS = bezierPatchAsPoints();
 	public static final RenderableObject BEZIER_PATCH_SURFACE = bezierPatchSurface();
+
+	public static final RenderableObject BEZIER_SURFACE_POINTS = bezierSurfaceAsPoints();
+	public static final RenderableObject BEZIER_SURFACE_SURFACE = bicubicBezierSurface();
 
 	public int shaderProgram() {
 		return attachedShader.SHADER_PROGRAM;
@@ -174,6 +179,20 @@ public class RenderableObject {
 
 		return patch;
 	}
+	
+	private static Grid<Vector3f> bezierSurfacePoints() {
+		Grid<Vector3f> patch = new Grid<Vector3f>();
+		final int WIDTH = 16; //16 4x4 patches
+		for(int i = 0; i != WIDTH; ++i) {
+			for(int j = 0; j != WIDTH; ++j) {
+				double height =  (i-8) *(i-8) * (j-8) / 16.0;
+
+				patch.put(i, j, new Vector3f(i, j, (float) height));
+			}
+		}
+
+		return patch;
+	}
 
 
 
@@ -274,10 +293,33 @@ public class RenderableObject {
 
 		return setupPointCloud(points);
 	}
+	
+	private static RenderableObject bezierSurfaceAsPoints() {
+		Grid<Vector3f> patch = bezierSurfacePoints();
+		List<Vector3f> points = new ArrayList<>();
+		Iterator<Vector3f> it = patch.elements();
+		while (it.hasNext()) {
+			points.add(it.next());
+		}
 
+		return setupPointCloud(points);
+	}
+
+	//With the proper collapsing
+	private static RenderableObject bicubicBezierSurface() {
+		BicubicBezierSurface bs = new BicubicBezierSurface(10, 10);
+		List<Vector3f> points = Arrays.asList(bs.collapsePointsIntoPatches());
+		Iterator<Vector3f> it = points.iterator();
+		while (it.hasNext()) {
+			points.add(it.next());
+		}
+
+		return setupPointCloud(points);
+	}
+	
 	private static RenderableObject bezierPatchSurface() {
 		Grid<Vector3f> patch = bezierPatchPoints();
-		List<Vector3f> points = new ArrayList<>(16);
+		List<Vector3f> points = new ArrayList<>(patch.size());
 		
 		for(int i = 0; i != patch.size(); ++i) {
 			points.add(null);
@@ -294,8 +336,28 @@ public class RenderableObject {
 		return setupPoints(points, GL40.GL_PATCHES, ShaderFactory.BEZIER_SURFACE);
 
 	}
+	
+	private static RenderableObject bezierCompositeSurface() {
+		Grid<Vector3f> patch = bezierSurfacePoints();
+		List<Vector3f> points = new ArrayList<>(patch.size());
+		
+		for(int i = 0; i != patch.size(); ++i) {
+			points.add(null);
+		}
 
+		Iterator<Vector2i> it = patch.points();
+		while(it.hasNext()) {
+			Vector2i coordinate = it.next();
+			int linearIndex = (coordinate.x%4) * 4 + coordinate.y%4; //relative index;
+			
+			int patchOffset = (coordinate.x / 4) * 16 + (coordinate.y/4) * 64;
+			points.set(linearIndex + patchOffset, patch.get(coordinate));
+		}
+		
+		
+		return setupPoints(points, GL40.GL_PATCHES, ShaderFactory.BEZIER_SURFACE);
 
+	}
 
 	private static RenderableObject setupQuad() {
 		float[] vertices = {

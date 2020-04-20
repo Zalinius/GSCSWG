@@ -95,8 +95,8 @@ public class Basic {
 	private void loop() {
 		int activeProgram;
 		RenderableObject axes = RenderableObject.AXES_COLORED;
-		RenderableObject model = RenderableObject.BEZIER_PATCH_SURFACE;
-		RenderableObject sample = RenderableObject.BEZIER_PATCH_POINTS;
+		RenderableObject model = RenderableObject.BEZIER_SURFACE_SURFACE;
+		RenderableObject sample = RenderableObject.BEZIER_SURFACE_POINTS;
 		glPointSize(5);
 
 		//Set up transformation matrices
