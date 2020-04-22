@@ -83,6 +83,8 @@ public class Basic {
 		glfwSwapInterval(1);     // Enable v-sync
 		glfwShowWindow(window);
 		GL.createCapabilities(); //critical for LWJGL's interoperation with GLFW's
+		//glEnable(GL_CULL_FACE);
+		glEnable(GL_DEPTH_TEST);
 		initializeInput();
 		initializeTesselation();
 
