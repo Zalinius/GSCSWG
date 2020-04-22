@@ -1,7 +1,7 @@
 #version 430
 
 layout(triangles) in; //Input type from TES
-layout(line_strip, max_vertices = 4) out; //output type (and number of vertices) to be rendered
+layout(triangle_strip, max_vertices = 3) out; //output type (and number of vertices) to be rendered
 
 in int gl_PrimitiveIDIn[];
 in int gl_InvocationID[]; 
@@ -12,7 +12,7 @@ in gl_PerVertex {
   float gl_PointSize;
   float gl_ClipDistance[];
 } input_from_TES[];
-
+in vec3 normal[];
 
 out gl_PerVertex
 {
@@ -20,15 +20,20 @@ out gl_PerVertex
   float gl_PointSize;
   float gl_ClipDistance[];
 }; //output from GS
+out vec3 out_normal;
 
 void main(){ // 3 lines from four points, for a triangle mesh
 	gl_Position = input_from_TES[0].gl_Position;
+	out_normal = normal[0];
 	EmitVertex();
+	
 	gl_Position = input_from_TES[1].gl_Position;
+	out_normal = normal[1];
 	EmitVertex();
+
 	gl_Position = input_from_TES[2].gl_Position;
+	out_normal = normal[2];
 	EmitVertex();
-	gl_Position = input_from_TES[0].gl_Position;
-	EmitVertex();
+	
 	EndPrimitive();
 }
