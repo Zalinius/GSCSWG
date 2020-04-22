@@ -94,6 +94,10 @@ public class Camera {
 		}
 	}
 	
+	public Vector3f position() {
+		return position;
+	}
+	
 	public void mouseMoved(double xpos, double ypos) {
         float dt = 1/60f; //TODO get real DeltaTime
         double dx = xpos - lastMousePosX;

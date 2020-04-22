@@ -29,6 +29,7 @@ out gl_PerVertex {
   float gl_ClipDistance[];
 };
 out vec3 normal;
+out vec3 fragmentPosition; // in model space
 
 void main()
 { 
@@ -79,6 +80,6 @@ void main()
   vTangent.z = dot(uParameter, transpose(bezier) * positionMatrixZ * bezier * dvParameter);
   
   normal = normalize(cross(uTangent, vTangent));
-  
+  fragmentPosition = (mm*gl_Position).xyz;
   gl_Position = pm*vm*mm*gl_Position;
 }
