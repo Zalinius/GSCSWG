@@ -8,6 +8,7 @@ import org.lwjgl.system.*;
 import model.RenderableObject;
 
 import org.joml.Matrix4f;
+import org.joml.Vector3f;
 
 import java.nio.*;
 
@@ -109,7 +110,7 @@ public class Basic {
 
 
 		// Set the clear color
-		glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
+		glClearColor(0.8f, 0.8f, 1.0f, 0.0f);
 
 		// Run the rendering loop until the user has attempted to close
 		// the window or has pressed the ESCAPE key.
@@ -128,6 +129,8 @@ public class Basic {
 			int pmLoc = glGetUniformLocation(activeProgram, "pm");
 			int vmLoc = glGetUniformLocation(activeProgram, "vm");
 			int tlLoc = glGetUniformLocation(activeProgram, "tessLevel");
+			int camLoc = glGetUniformLocation(activeProgram, "camera_position");
+
 
 			FloatBuffer mmBuf = BufferUtils.createFloatBuffer(16);
 			FloatBuffer pmBuf = BufferUtils.createFloatBuffer(16);
@@ -140,6 +143,8 @@ public class Basic {
 			glUniformMatrix4fv(pmLoc, false, pmBuf);
 			glUniformMatrix4fv(vmLoc, false, vmBuf);
 			glUniform1f(tlLoc, tesselation);
+			Vector3f camPos = camera.position();
+			glUniform3f(camLoc, camPos.x, camPos.y, camPos.z);
 			checkError("model uniform calls");
 
 			glDrawArrays(model.RENDER_MODE, 0, model.VERTICES);
