@@ -291,7 +291,7 @@ public class RenderableObject {
 		}
 		
 		
-		return setupPoints(points, GL40.GL_PATCHES, ShaderFactory.BEZIER_SURFACE);
+		return setupPoints(points, GL40.GL_PATCHES, ShaderFactory.CATMULL_ROM_SURFACE);
 
 	}
 

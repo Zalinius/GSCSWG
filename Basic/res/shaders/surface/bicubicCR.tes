@@ -1,0 +1,96 @@
+#version 430 core
+
+uniform mat4 mm;
+uniform mat4 vm;
+uniform mat4 pm;
+
+//TES options
+layout(quads, equal_spacing) in;
+
+in gl_PerVertex
+{
+  vec4 gl_Position;
+  float gl_PointSize;
+  float gl_ClipDistance[];
+} input_from_TCS[];
+
+//Built-in inputs
+in vec3 gl_TessCoord[];
+//Each TessCoord received is of the form <x,y> where x is 0, and y is on [0,1].
+//We'll be using x and y as our spline surface parameters
+
+in int gl_PatchVerticesIn[];
+in int gl_PrimitiveID[];
+
+//Custom block outputs
+out gl_PerVertex {
+  vec4 gl_Position;
+  float gl_PointSize;
+  float gl_ClipDistance[];
+};
+out vec3 normal;
+out vec3 fragmentPosition; // in model space
+
+void main()
+{ 
+  float u = gl_TessCoord[0].x;
+  float v = gl_TessCoord[0].y;
+  vec4 uParameter = vec4(1, u, u*u, u*u*u);
+  vec4 vParameter = vec4(1, v, v*v, v*v*v);
+  
+  //partial derivatives of the above
+  vec4 duParameter = vec4(0, 1, 2*u, 3*u*u);
+  vec4 dvParameter = vec4(0, 1, 2*v, 3*v*v);
+  
+  mat4 positionMatrixX;
+  mat4 positionMatrixY;
+  mat4 positionMatrixZ;
+  for(int i = 0; i != 16; ++i){
+    positionMatrixX[i/4][i%4] = input_from_TCS[i].gl_Position.x;
+    positionMatrixY[i/4][i%4] = input_from_TCS[i].gl_Position.y;
+    positionMatrixZ[i/4][i%4] = input_from_TCS[i].gl_Position.z;
+  }
+  
+  mat4 catmull_rom;
+  catmull_rom[0][0] = 1;
+  catmull_rom[1][0] = -3;
+  catmull_rom[2][0] = 3;
+  catmull_rom[3][0] = -1;
+  
+  catmull_rom[0][1] = 4;
+  catmull_rom[1][1] = 0;
+  catmull_rom[2][1] = -6;
+  catmull_rom[3][1] = 3;
+  
+  catmull_rom[0][2] = 1;
+  catmull_rom[1][2] = 3;
+  catmull_rom[2][2] = 3;
+  catmull_rom[3][2] = -3;
+  
+  catmull_rom[0][3] = 0;
+  catmull_rom[1][3] = 0;
+  catmull_rom[2][3] = 0;
+  catmull_rom[3][3] = 1;
+  
+  catmull_rom *= 0.5f;
+  
+  gl_Position.x = dot(uParameter, transpose(catmull_rom) * positionMatrixX * catmull_rom * vParameter);
+  gl_Position.y = dot(uParameter, transpose(catmull_rom) * positionMatrixY * catmull_rom * vParameter);
+  gl_Position.z = dot(uParameter, transpose(catmull_rom) * positionMatrixZ * catmull_rom * vParameter);
+  gl_Position.w = 1;
+  
+  
+  //Partial tangent vectors
+  vec3 uTangent;
+  vec3 vTangent;
+  uTangent.x = dot(duParameter, transpose(catmull_rom) * positionMatrixX * catmull_rom * vParameter);
+  uTangent.y = dot(duParameter, transpose(catmull_rom) * positionMatrixY * catmull_rom * vParameter);
+  uTangent.z = dot(duParameter, transpose(catmull_rom) * positionMatrixZ * catmull_rom * vParameter);
+  vTangent.x = dot(uParameter, transpose(catmull_rom) * positionMatrixX * catmull_rom * dvParameter);
+  vTangent.y = dot(uParameter, transpose(catmull_rom) * positionMatrixY * catmull_rom * dvParameter);
+  vTangent.z = dot(uParameter, transpose(catmull_rom) * positionMatrixZ * catmull_rom * dvParameter);
+  
+  normal = normalize(cross(uTangent, vTangent));
+  fragmentPosition = (mm*gl_Position).xyz;
+  gl_Position = pm*vm*mm*gl_Position;
+}
