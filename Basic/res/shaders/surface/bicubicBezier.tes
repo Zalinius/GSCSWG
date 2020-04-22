@@ -22,12 +22,13 @@ in vec3 gl_TessCoord[];
 in int gl_PatchVerticesIn[];
 in int gl_PrimitiveID[];
 
-//Built-in outputs
+//Custom block outputs
 out gl_PerVertex {
   vec4 gl_Position;
   float gl_PointSize;
   float gl_ClipDistance[];
 };
+out vec3 normal;
 
 void main()
 { 
@@ -35,6 +36,10 @@ void main()
   float v = gl_TessCoord[0].y;
   vec4 uParameter = vec4(1, u, u*u, u*u*u);
   vec4 vParameter = vec4(1, v, v*v, v*v*v);
+  
+  //partial derivatives of the above
+  vec4 duParameter = vec4(0, 1, 2*u, 3*u*u);
+  vec4 dvParameter = vec4(0, 1, 2*v, 3*v*v);
   
   mat4 positionMatrixX;
   mat4 positionMatrixY;
@@ -61,6 +66,19 @@ void main()
   gl_Position.y = dot(uParameter, transpose(bezier) * positionMatrixY * bezier * vParameter);
   gl_Position.z = dot(uParameter, transpose(bezier) * positionMatrixZ * bezier * vParameter);
   gl_Position.w = 1;
-
+  
+  
+  //Partial tangent vectors
+  vec3 uTangent;
+  vec3 vTangent;
+  uTangent.x = dot(duParameter, transpose(bezier) * positionMatrixX * bezier * vParameter);
+  uTangent.y = dot(duParameter, transpose(bezier) * positionMatrixY * bezier * vParameter);
+  uTangent.z = dot(duParameter, transpose(bezier) * positionMatrixZ * bezier * vParameter);
+  vTangent.x = dot(uParameter, transpose(bezier) * positionMatrixX * bezier * dvParameter);
+  vTangent.y = dot(uParameter, transpose(bezier) * positionMatrixY * bezier * dvParameter);
+  vTangent.z = dot(uParameter, transpose(bezier) * positionMatrixZ * bezier * dvParameter);
+  
+  normal = normalize(cross(uTangent, vTangent));
+  
   gl_Position = pm*vm*mm*gl_Position;
 }
