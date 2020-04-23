@@ -294,6 +294,19 @@ public class RenderableObject {
 		return setupPoints(points, GL40.GL_PATCHES, ShaderFactory.CATMULL_ROM_SURFACE);
 
 	}
+	
+	/**
+	 * 
+	 * @param patchData The pre-collated data for the patches. Size must be a multiple of 16.
+	 * @return
+	 */
+	public static RenderableObject bezierCompositeSurface(List<Vector3f> patchData) {
+		if(patchData.size() % 16 != 0) {
+			throw new RuntimeException("patch data must have multiple of 16 elements: " + patchData.size());
+		}
+		
+		return setupPoints(patchData, GL40.GL_PATCHES, ShaderFactory.BEZIER_SURFACE);
+	}
 
 
 

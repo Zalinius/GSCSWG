@@ -5,6 +5,7 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.*;
 
+import model.BezierCylinder;
 import model.RenderableObject;
 
 import org.joml.Matrix4f;
@@ -97,8 +98,9 @@ public class Basic {
 
 	private void loop() {
 		int activeProgram;
+		BezierCylinder bc = new BezierCylinder();
 		RenderableObject axes = RenderableObject.AXES_COLORED;
-		RenderableObject model = RenderableObject.BEZIER_PATCH_SURFACE;
+		RenderableObject model = bc.getModel();
 		RenderableObject sample = RenderableObject.BEZIER_PATCH_POINTS;
 		glPointSize(5);
 
