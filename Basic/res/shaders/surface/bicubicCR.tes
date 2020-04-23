@@ -52,24 +52,24 @@ void main()
   }
   
   mat4 catmull_rom;
-  catmull_rom[0][0] = 1;
-  catmull_rom[1][0] = -3;
-  catmull_rom[2][0] = 3;
+  catmull_rom[0][0] = 0;
+  catmull_rom[1][0] = -1;
+  catmull_rom[2][0] = 2;
   catmull_rom[3][0] = -1;
   
-  catmull_rom[0][1] = 4;
+  catmull_rom[0][1] = 2;
   catmull_rom[1][1] = 0;
-  catmull_rom[2][1] = -6;
+  catmull_rom[2][1] = -5;
   catmull_rom[3][1] = 3;
   
-  catmull_rom[0][2] = 1;
-  catmull_rom[1][2] = 3;
-  catmull_rom[2][2] = 3;
+  catmull_rom[0][2] = 0;
+  catmull_rom[1][2] = 1;
+  catmull_rom[2][2] = 4;
   catmull_rom[3][2] = -3;
   
   catmull_rom[0][3] = 0;
   catmull_rom[1][3] = 0;
-  catmull_rom[2][3] = 0;
+  catmull_rom[2][3] = -1;
   catmull_rom[3][3] = 1;
   
   catmull_rom *= 0.5f;
