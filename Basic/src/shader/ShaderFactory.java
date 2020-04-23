@@ -22,6 +22,7 @@ import static org.lwjgl.opengl.GL20.glShaderSource;
 import java.io.File;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -32,6 +33,7 @@ import model.OBJLoader;
 
 public class ShaderFactory {
 	public static final SurfaceShader BEZIER_SURFACE = new SurfaceShader(bezierPatchShadersProgram());
+	public static final SurfaceShader CATMULL_ROM_SURFACE = new SurfaceShader(crPatchShadersProgram());
 
 	public static final Shader BASIC = new Shader(basicShadersProgram());
 	public static final Shader COLOR = new Shader(colorShadersProgram());
@@ -52,12 +54,26 @@ public class ShaderFactory {
 	private static int bezierSplineShadersProgram() {
 		return makeShader(new File("res/shaders/"), "bezier");
 	}
+	
 	private static int bezierPatchShadersProgram() {
-		return makeShader(new File("res/shaders/surface/"), "bicubicBezier");
+		return makeShader(new File("res/shaders/surface/"), "bicubicBase", "bicubicBezier");
+	}
+	private static int crPatchShadersProgram() {
+		return makeShader(new File("res/shaders/surface/"), "bicubicBase", "bicubicCR");
 	}
 
 
-	private static int makeShader(File shaderProgramDirectory, String shaderName) {
+	private static int makeShader(File shaderProgramDirectory, String baseShaderName) {
+		return makeShader(shaderProgramDirectory, baseShaderName, baseShaderName);
+	}
+	
+	/**
+	 * @param shaderProgramDirectory The folder the shaders are in
+	 * @param baseShaderName The name of the VS, TCS, GC, FS
+	 * @param splineShaderName The name of the TES
+	 * @return A compiled and linked shader program
+	 */
+	private static int makeShader(File shaderProgramDirectory, String baseShaderName, String splineShaderName) {
 		if(!shaderProgramDirectory.isDirectory()) {
 			throw new RuntimeException("Not a directory");
 		}
@@ -65,19 +81,28 @@ public class ShaderFactory {
 			throw new RuntimeException("Directory does not exist");
 		}
 		
-		File[] shaderFiles = shaderProgramDirectory.listFiles(filter(shaderName));
-
+		List<File> shaderFiles = new ArrayList<>();
 
 		
+		File[] baseShaderFiles = shaderProgramDirectory.listFiles(filter(baseShaderName));
+		shaderFiles.addAll(Arrays.asList(baseShaderFiles));
+		
+		if(!baseShaderName.equals(splineShaderName)) {
+			File[] splineShaderFile = shaderProgramDirectory.listFiles(filter(splineShaderName));
+			shaderFiles.addAll(Arrays.asList(splineShaderFile));
+		}
+
+
 		List<Integer> compiledShaders = new ArrayList<>();
-		for (int i = 0; i < shaderFiles.length; i++) {
-			File file = shaderFiles[i];
+		for (Iterator<File> it = shaderFiles.iterator(); it.hasNext();) {
+			File file = it.next();
 			String shaderSource = OBJLoader.readEntireFile(file);
 			int shaderType = shaderGLTypes().get(file.getName().substring(file.getName().lastIndexOf('.')+1));
-			compiledShaders.add(compileShader(shaderSource, shaderName, shaderType));
+			compiledShaders.add(compileShader(shaderSource, file.getName(), shaderType));
+			System.out.println(file.getName());
 		}
-		
-		return compileProgram(compiledShaders, shaderName);
+		System.out.println();
+		return compileProgram(compiledShaders, splineShaderName);
 	}
 	
 	private static int compileProgram(List<Integer> shaders, String shaderName) {
@@ -149,6 +174,7 @@ public class ShaderFactory {
 			}
 		};
 	}
+
 		
 	private static Set<String> shaderFileExtensions(){
 		return shaderGLTypes().keySet();

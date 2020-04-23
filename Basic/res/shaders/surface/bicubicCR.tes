@@ -51,42 +51,44 @@ void main()
     positionMatrixZ[i/4][i%4] = input_from_TCS[i].gl_Position.z;
   }
   
-  mat4 bezier;
-  bezier[0][0] = 1;
-  bezier[1][0] = -3;
-  bezier[2][0] = 3;
-  bezier[3][0] = -1;
+  mat4 catmull_rom;
+  catmull_rom[0][0] = 0;
+  catmull_rom[1][0] = -1;
+  catmull_rom[2][0] = 2;
+  catmull_rom[3][0] = -1;
   
-  bezier[0][1] = 0;
-  bezier[1][1] = 3;
-  bezier[2][1] = -6;
-  bezier[3][1] = 3;
+  catmull_rom[0][1] = 2;
+  catmull_rom[1][1] = 0;
+  catmull_rom[2][1] = -5;
+  catmull_rom[3][1] = 3;
   
-  bezier[0][2] = 0;
-  bezier[1][2] = 0;
-  bezier[2][2] = 3;
-  bezier[3][2] = -3;
+  catmull_rom[0][2] = 0;
+  catmull_rom[1][2] = 1;
+  catmull_rom[2][2] = 4;
+  catmull_rom[3][2] = -3;
   
-  bezier[0][3] = 0;
-  bezier[1][3] = 0;
-  bezier[2][3] = 0;
-  bezier[3][3] = 1;
+  catmull_rom[0][3] = 0;
+  catmull_rom[1][3] = 0;
+  catmull_rom[2][3] = -1;
+  catmull_rom[3][3] = 1;
   
-  gl_Position.x = dot(uParameter, transpose(bezier) * positionMatrixX * bezier * vParameter);
-  gl_Position.y = dot(uParameter, transpose(bezier) * positionMatrixY * bezier * vParameter);
-  gl_Position.z = dot(uParameter, transpose(bezier) * positionMatrixZ * bezier * vParameter);
+  catmull_rom *= 0.5f;
+  
+  gl_Position.x = dot(uParameter, transpose(catmull_rom) * positionMatrixX * catmull_rom * vParameter);
+  gl_Position.y = dot(uParameter, transpose(catmull_rom) * positionMatrixY * catmull_rom * vParameter);
+  gl_Position.z = dot(uParameter, transpose(catmull_rom) * positionMatrixZ * catmull_rom * vParameter);
   gl_Position.w = 1;
   
   
   //Partial tangent vectors
   vec3 uTangent;
   vec3 vTangent;
-  uTangent.x = dot(duParameter, transpose(bezier) * positionMatrixX * bezier * vParameter);
-  uTangent.y = dot(duParameter, transpose(bezier) * positionMatrixY * bezier * vParameter);
-  uTangent.z = dot(duParameter, transpose(bezier) * positionMatrixZ * bezier * vParameter);
-  vTangent.x = dot(uParameter, transpose(bezier) * positionMatrixX * bezier * dvParameter);
-  vTangent.y = dot(uParameter, transpose(bezier) * positionMatrixY * bezier * dvParameter);
-  vTangent.z = dot(uParameter, transpose(bezier) * positionMatrixZ * bezier * dvParameter);
+  uTangent.x = dot(duParameter, transpose(catmull_rom) * positionMatrixX * catmull_rom * vParameter);
+  uTangent.y = dot(duParameter, transpose(catmull_rom) * positionMatrixY * catmull_rom * vParameter);
+  uTangent.z = dot(duParameter, transpose(catmull_rom) * positionMatrixZ * catmull_rom * vParameter);
+  vTangent.x = dot(uParameter, transpose(catmull_rom) * positionMatrixX * catmull_rom * dvParameter);
+  vTangent.y = dot(uParameter, transpose(catmull_rom) * positionMatrixY * catmull_rom * dvParameter);
+  vTangent.z = dot(uParameter, transpose(catmull_rom) * positionMatrixZ * catmull_rom * dvParameter);
   
   normal = normalize(cross(uTangent, vTangent));
   fragmentPosition = (mm*gl_Position).xyz;
