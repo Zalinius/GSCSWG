@@ -99,7 +99,6 @@ public class ShaderFactory {
 			String shaderSource = OBJLoader.readEntireFile(file);
 			int shaderType = shaderGLTypes().get(file.getName().substring(file.getName().lastIndexOf('.')+1));
 			compiledShaders.add(compileShader(shaderSource, file.getName(), shaderType));
-			System.out.println(file.getName());
 		}
 		System.out.println();
 		return compileProgram(compiledShaders, splineShaderName);

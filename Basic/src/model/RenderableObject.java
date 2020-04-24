@@ -260,7 +260,7 @@ public class RenderableObject {
 		return setupPoints(points, GL11.GL_LINE_STRIP, ShaderFactory.BASIC);
 	}
 
-	private static RenderableObject setupPointCloud(List<Vector3f> points) {
+	public static RenderableObject setupPointCloud(List<Vector3f> points) {
 		return setupPoints(points, GL11.GL_POINTS, ShaderFactory.BASIC);
 	}
 
@@ -307,7 +307,6 @@ public class RenderableObject {
 		
 		return setupPoints(patchData, GL40.GL_PATCHES, ShaderFactory.BEZIER_SURFACE);
 	}
-
 
 
 	private static RenderableObject setupQuad() {
