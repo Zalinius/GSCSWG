@@ -48,20 +48,18 @@ public class BezierCylinder {
 		
 		float t1 = 1.0f/3.0f;
 		float t2 = 2.0f/3.0f;
+		CatmullRomSpline cr = new CatmullRomSpline(p0, p1, p2, p3);
+		ctrl1 = cr.position(t1);
+		ctrl2 = cr.position(t2);
 		
-		Matrix4x3f pMatrix = new Matrix4x3f(p0, p1, p2, p3);
-		Matrix4f crMatrix = new Matrix4f(0, -1, 2, -1, 2, 0, -5, 3, 0, 1, 4, -3, 0, 0, -1, 1);
+		BezierCircle c0, c1, c2, c3;
 		
-		Vector4f tVector = Utils.cubicVector(t1);
-		tVector.mul(crMatrix);
-		tVector.mul(pMatrix);
-		ctrl1 = new Vector3f(tVector.x(),tVector.y(),tVector.z());
+		c0 = new BezierCircle(knot1, cr.tangent(0), cr.unitBinormalVector(0));
+		c1 = new BezierCircle(ctrl1, cr.tangent(t1), cr.unitBinormalVector(t1));
+		c2 = new BezierCircle(ctrl2, cr.tangent(t2), cr.unitBinormalVector(t2));
+		c3 = new BezierCircle(knot2, cr.tangent(1), cr.unitBinormalVector(1));
 		
-		tVector = Utils.cubicVector(t2);
-		tVector.mul(crMatrix);
-		tVector.mul(pMatrix);
-		ctrl1 = new Vector3f(tVector.x(),tVector.y(),tVector.z());
-		
+		//TODO Now, get the patch data		
 	}
 
 	
@@ -140,6 +138,30 @@ public class BezierCylinder {
 		return pointsModel;
 	}
 	
-	
+	public static class BezierCircle{
+		private Vector3f center, top, bottom;
+		private Vector3f tTop, tBottom;
+		private float tT0, tT1, tB0, tB1;
+		
+		private final float RADIUS = 1;
+		
+		public BezierCircle(Vector3f center, Vector3f normal, Vector3f right) {
+			this.center = center;
+			Vector3f up = new Vector3f().add(right).cross(normal).normalize();
+			
+			top = new Vector3f(up).mul(RADIUS).add(center);
+			bottom = new Vector3f(up).mul(-RADIUS).add(center);
+			
+			tTop = new Vector3f(right).normalize();
+			tBottom = new Vector3f(right).mul(-1).normalize();
+			
+			tT0 = 1;			
+			tT1 = 1;			
+			
+			tB0 = 1;			
+			tB1 = 1;			
+		}
+		
+	}
 
 }
