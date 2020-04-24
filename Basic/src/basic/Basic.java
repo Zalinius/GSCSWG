@@ -209,7 +209,10 @@ public class Basic {
 
 			double dt = glfwGetTime() - lastFrameTime;
 			lastFrameTime += dt;
-			update((float)dt);
+			
+			float delta = (float) dt;
+			update(delta);
+			bc.update(delta);
 		}
 	}
 
