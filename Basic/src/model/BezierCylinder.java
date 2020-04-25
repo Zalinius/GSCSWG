@@ -33,34 +33,7 @@ public class BezierCylinder {
 		pointsModel = RenderableObject.setupPointCloud(getPatchData());
 		age = 0;
 	}
-	
-	/** 
-	 * A Bezier cylinder controlled by a catmull-rom spline
-	 * @param p0 control
-	 * @param p1 point
-	 * @param p2 point
-	 * @param p3 control
-	 */
-	public BezierCylinder(Vector3f p0, Vector3f p1, Vector3f p2, Vector3f p3) {
-		Vector3f knot1, knot2, ctrl1, ctrl2;
-		knot1 = p1;
-		knot2 = p2;
-		
-		float t1 = 1.0f/3.0f;
-		float t2 = 2.0f/3.0f;
-		CatmullRomSpline cr = new CatmullRomSpline(p0, p1, p2, p3);
-		ctrl1 = cr.position(t1);
-		ctrl2 = cr.position(t2);
-		
-		BezierCircle c0, c1, c2, c3;
-		
-		c0 = new BezierCircle(knot1, cr.tangent(0), cr.unitBinormalVector(0));
-		c1 = new BezierCircle(ctrl1, cr.tangent(t1), cr.unitBinormalVector(t1));
-		c2 = new BezierCircle(ctrl2, cr.tangent(t2), cr.unitBinormalVector(t2));
-		c3 = new BezierCircle(knot2, cr.tangent(1), cr.unitBinormalVector(1));
-		
-		//TODO Now, get the patch data		
-	}
+
 
 	
 	private float age;
@@ -136,32 +109,6 @@ public class BezierCylinder {
 	
 	public RenderableObject getPoints() {
 		return pointsModel;
-	}
-	
-	public static class BezierCircle{
-		private Vector3f center, top, bottom;
-		private Vector3f tTop, tBottom;
-		private float tT0, tT1, tB0, tB1;
-		
-		private final float RADIUS = 1;
-		
-		public BezierCircle(Vector3f center, Vector3f normal, Vector3f right) {
-			this.center = center;
-			Vector3f up = new Vector3f().add(right).cross(normal).normalize();
-			
-			top = new Vector3f(up).mul(RADIUS).add(center);
-			bottom = new Vector3f(up).mul(-RADIUS).add(center);
-			
-			tTop = new Vector3f(right).normalize();
-			tBottom = new Vector3f(right).mul(-1).normalize();
-			
-			tT0 = 1;			
-			tT1 = 1;			
-			
-			tB0 = 1;			
-			tB1 = 1;			
-		}
-		
 	}
 
 }

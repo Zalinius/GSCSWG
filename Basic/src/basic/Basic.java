@@ -6,6 +6,7 @@ import org.lwjgl.opengl.GL;
 import org.lwjgl.system.*;
 
 import model.BezierCylinder;
+import model.BezierCylinder2;
 import model.RenderableObject;
 
 import org.joml.Matrix4f;
@@ -98,7 +99,7 @@ public class Basic {
 
 	private void loop() {
 		int activeProgram;
-		BezierCylinder bc = new BezierCylinder();
+		BezierCylinder2 bc = BezierCylinder2.prototype();
 		RenderableObject axes = RenderableObject.AXES_COLORED;
 		RenderableObject model = bc.getModel();
 		RenderableObject sample = bc.getPoints();
@@ -212,7 +213,7 @@ public class Basic {
 			
 			float delta = (float) dt;
 			update(delta);
-			bc.update(delta);
+			//bc.update(delta);
 		}
 	}
 
