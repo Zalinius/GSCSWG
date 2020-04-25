@@ -99,7 +99,7 @@ public class Basic {
 
 	private void loop() {
 		int activeProgram;
-		BezierCylinder2 bc = BezierCylinder2.prototype();
+		BezierSnake bc = new BezierSnake();
 		RenderableObject axes = RenderableObject.AXES_COLORED;
 		RenderableObject model = bc.getModel();
 		RenderableObject sample = bc.getPoints();
