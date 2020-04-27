@@ -103,6 +103,7 @@ public class Basic {
 		RenderableObject axes = RenderableObject.AXES_COLORED;
 		RenderableObject model = bc.getModel();
 		RenderableObject sample = bc.getPoints();
+    
 		glPointSize(5);
 
 		//Set up transformation matrices
