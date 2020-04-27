@@ -4,8 +4,8 @@ import shader.CurveShader;
 
 public class Surface extends RenderableObject {
 
-	public Surface(int VAO, int VERTICES, int RENDER_MODE, CurveShader shaderProgram) {
-		super(VAO, VERTICES, RENDER_MODE, shaderProgram);
+	public Surface(int VAO, int vertexVBO, int VERTICES, int RENDER_MODE, CurveShader shaderProgram) {
+		super(VAO, vertexVBO, VERTICES, RENDER_MODE, shaderProgram);
 	}
 
 }

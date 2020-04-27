@@ -30,7 +30,7 @@ vec4 computeLitColorForSingleSource(vec3 normal, vec3 fragment_position, vec3 vi
 	vec4 result;
 	vec3 light_color = vec3(1,1,1);
 	vec3 object_color = vec3(1,1,1);
-	vec3 light_position = vec3(0,0,-10);
+	vec3 light_position = vec3(0,0,0);
 	
 	//Ambient 
 	float ambient_strength = 0.19225f;

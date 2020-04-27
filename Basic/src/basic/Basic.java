@@ -5,6 +5,8 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.*;
 
+import model.BezierCylinder;
+import model.BezierCylinder2;
 import model.RenderableObject;
 
 import org.joml.Matrix4f;
@@ -97,9 +99,11 @@ public class Basic {
 
 	private void loop() {
 		int activeProgram;
+		BezierSnake bc = new BezierSnake();
 		RenderableObject axes = RenderableObject.AXES_COLORED;
-		RenderableObject model = RenderableObject.CATMULL_ROM_SURFACE;
-		RenderableObject sample = RenderableObject.BEZIER_PATCH_POINTS;
+		RenderableObject model = bc.getModel();
+		RenderableObject sample = bc.getPoints();
+    
 		glPointSize(5);
 
 		//Set up transformation matrices
@@ -207,7 +211,10 @@ public class Basic {
 
 			double dt = glfwGetTime() - lastFrameTime;
 			lastFrameTime += dt;
-			update((float)dt);
+			
+			float delta = (float) dt;
+			update(delta);
+			//bc.update(delta);
 		}
 	}
 

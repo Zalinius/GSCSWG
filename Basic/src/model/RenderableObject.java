@@ -5,6 +5,7 @@ import static org.lwjgl.opengl.GL15.GL_ARRAY_BUFFER;
 import static org.lwjgl.opengl.GL15.GL_STATIC_DRAW;
 import static org.lwjgl.opengl.GL15.glBindBuffer;
 import static org.lwjgl.opengl.GL15.glBufferData;
+import static org.lwjgl.opengl.GL15.glBufferSubData;
 import static org.lwjgl.opengl.GL15.glGenBuffers;
 import static org.lwjgl.opengl.GL20.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30.glBindVertexArray;
@@ -33,15 +34,26 @@ import shader.ShaderFactory;
 public class RenderableObject {
 
 	public final int VAO;
+	private int vertexVBO;
 	public final int VERTICES;
 	public final int RENDER_MODE;
 	private Shader attachedShader;
 
-	public RenderableObject(int VAO, int VERTICES, int RENDER_MODE, Shader shaderProgram) {
+	public RenderableObject(int VAO, int vertexVBO, int VERTICES, int RENDER_MODE, Shader shaderProgram) {
 		this.VAO = VAO;
 		this.VERTICES = VERTICES;
 		this.RENDER_MODE = RENDER_MODE;
 		this.attachedShader = shaderProgram;
+		this.vertexVBO = vertexVBO;
+	}
+	
+	public void updateVertices(List<Vector3f> points) {
+		float[] data = collapseVectorList(points);
+		glBindVertexArray(VAO);
+		
+		rebufferVBO(vertexVBO, data);
+
+		glBindVertexArray(0);
 	}
 
 	public static final RenderableObject LINE = sampleLine();
@@ -72,7 +84,7 @@ public class RenderableObject {
 		int vertexCount = vertices.length / 3;
 		glBindVertexArray(0);
 
-		return new RenderableObject(vao, vertexCount, renderMode, shader);
+		return new RenderableObject(vao, vbo, vertexCount, renderMode, shader);
 	}
 
 	private static RenderableObject setupVerticesWithColors(float[] vertices, float[] colors, int renderMode) {
@@ -92,7 +104,7 @@ public class RenderableObject {
 		glBindVertexArray(0);
 		int vertexCount = vertices.length / 3;
 
-		return new RenderableObject(vao, vertexCount, renderMode, ShaderFactory.COLOR);
+		return new RenderableObject(vao, vbos[0], vertexCount, renderMode, ShaderFactory.COLOR);
 	}
 
 	private static void setupVBO(int vbo, float[] data, int attributeIndex, int dimensionality) {
@@ -105,6 +117,16 @@ public class RenderableObject {
 		glVertexAttribPointer(attributeIndex, dimensionality, GL_FLOAT, false, 0, 0);	
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		GL20.glEnableVertexAttribArray(attributeIndex);
+	}
+	
+	private static void rebufferVBO(int vbo, float[] data) {
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		FloatBuffer buffer = BufferUtils.createFloatBuffer(data.length);
+		buffer.put(data);
+		buffer.flip();
+		glBufferSubData(GL_ARRAY_BUFFER, 0, buffer);
+
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 	}
 
 	private static RenderableObject coloredAxes() {
@@ -299,7 +321,7 @@ public class RenderableObject {
 		return setupPoints(points, GL11.GL_LINE_STRIP, ShaderFactory.BASIC);
 	}
 
-	private static RenderableObject setupPointCloud(List<Vector3f> points) {
+	public static RenderableObject setupPointCloud(List<Vector3f> points) {
 		return setupPoints(points, GL11.GL_POINTS, ShaderFactory.BASIC);
 	}
 
@@ -333,7 +355,19 @@ public class RenderableObject {
 		return setupPoints(points, GL40.GL_PATCHES, ShaderFactory.CATMULL_ROM_SURFACE);
 
 	}
-
+	
+	/**
+	 * 
+	 * @param patchData The pre-collated data for the patches. Size must be a multiple of 16.
+	 * @return
+	 */
+	public static RenderableObject bezierCompositeSurface(List<Vector3f> patchData) {
+		if(patchData.size() % 16 != 0) {
+			throw new RuntimeException("patch data must have multiple of 16 elements: " + patchData.size());
+		}
+		
+		return setupPoints(patchData, GL40.GL_PATCHES, ShaderFactory.BEZIER_SURFACE);
+	}
 
 
 	private static RenderableObject setupQuad() {
@@ -406,8 +440,8 @@ public class RenderableObject {
 
 		return setupPoints(points, GL11.GL_LINE_STRIP, ShaderFactory.BASIC);
 	}
-
-	public static RenderableObject setupPoints(List<Vector3f> points, int renderMode, Shader shader) {
+	
+	public static float[] collapseVectorList(List<Vector3f> points) {
 		float[] vertexData = new float[points.size() * 3];
 
 		int vertexDataIndex = 0;
@@ -419,8 +453,12 @@ public class RenderableObject {
 			vertexData[vertexDataIndex+1] = point.y;
 			vertexData[vertexDataIndex+2] = point.z;
 		}
+		
+		return vertexData;
+	}
 
-		return setupVertices(vertexData, renderMode, shader);
+	public static RenderableObject setupPoints(List<Vector3f> points, int renderMode, Shader shader) {
+		return setupVertices(collapseVectorList(points), renderMode, shader);
 	}
 
 }
