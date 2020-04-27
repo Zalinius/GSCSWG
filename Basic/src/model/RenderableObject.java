@@ -53,6 +53,8 @@ public class RenderableObject {
 	public static final RenderableObject AXES_COLORED = coloredAxes();
 	public static final RenderableObject BEZIER_PATCH_POINTS = bezierPatchAsPoints();
 	public static final RenderableObject BEZIER_PATCH_SURFACE = bezierPatchSurface();
+	
+	public static final RenderableObject CATMULL_ROM_SURFACE = catmullRomSurface();
 
 	public int shaderProgram() {
 		return attachedShader.SHADER_PROGRAM;
@@ -174,7 +176,44 @@ public class RenderableObject {
 
 		return patch;
 	}
+	
+	private static Vector3f[][] catmullRomSurfacePoints() {
+		final int WIDTH = 10;
+		final int HEIGHT = 10;
+		Vector3f[][] pointsArray = new Vector3f[WIDTH][];
 
+		for(int i = 0; i != WIDTH; ++i) {
+			pointsArray[i] = new Vector3f[HEIGHT];
+			
+			for(int j = 0; j != HEIGHT; ++j) {
+				float height;
+				height = (float) (Math.sin(2*i)*Math.sin(2*j));
+				
+				pointsArray[i][j] = new Vector3f(i,j,height);
+			}
+		}
+
+		return pointsArray;
+	}
+	
+	private static RenderableObject catmullRomSurface() {
+		Vector3f[][] surfacePoints = catmullRomSurfacePoints();
+		List<Vector3f> patches = new ArrayList<>();
+		
+
+		for(int iPatch = 0; iPatch != 7; ++iPatch) {
+			for(int jPatch = 0; jPatch != 7; ++jPatch) {
+				for(int i = 0; i != 4; ++i) {
+					for(int j = 0; j != 4; ++j) {
+						Vector3f point = surfacePoints[iPatch + i][jPatch + j];
+						patches.add(point);
+					}
+				}
+			}
+		}
+
+		return setupPoints(patches, GL40.GL_PATCHES, ShaderFactory.CATMULL_ROM_SURFACE);
+	}
 
 
 	public static RenderableObject samplec1SmoothSplineCurve(){
