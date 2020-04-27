@@ -98,7 +98,7 @@ public class Basic {
 	private void loop() {
 		int activeProgram;
 		RenderableObject axes = RenderableObject.AXES_COLORED;
-		RenderableObject model = RenderableObject.BEZIER_PATCH_SURFACE;
+		RenderableObject model = RenderableObject.CATMULL_ROM_SURFACE;
 		RenderableObject sample = RenderableObject.BEZIER_PATCH_POINTS;
 		glPointSize(5);
 
