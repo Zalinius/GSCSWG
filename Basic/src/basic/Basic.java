@@ -7,14 +7,8 @@ import org.lwjgl.system.*;
 
 import animation.AnimatedCatmullRomSurface;
 import animation.physics.ForceField;
-import animation.physics.PointGravity;
 import animation.physics.SinField;
-import model.BezierCylinder;
-import model.BezierCylinder2;
-import model.CatmullRomSurfaces;
 import model.RenderableObject;
-import model.SplineSurface;
-
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 

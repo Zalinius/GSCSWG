@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.joml.Vector3f;
 
+import dataStructures.CircularGrid;
+
 public class CatmullRomSurfaces {
 	public static SplineSurface crSurface() {
 		return new SplineSurface(RenderableObject.CATMULL_ROM_SURFACE, RenderableObject.CATMULL_ROM_POINTS);
@@ -25,11 +27,10 @@ public class CatmullRomSurfaces {
 		return new SplineSurface(surface, points);
 	}
 	
-	public static Vector3f[][] crToroidPatchData(int length, int width, float toroidRadius, float cylinderRadius){
-		Vector3f[][] toroidGrid = new Vector3f[length][];
+	public static CircularGrid<Vector3f> crToroidPatchData(int length, int width, float toroidRadius, float cylinderRadius){
+		CircularGrid<Vector3f> toroidGrid = new CircularGrid<>(length, width);
 		
 		for(int i = 0; i != length; ++i) {
-			toroidGrid[i] = new Vector3f[width];
 			float phi = (float) (2*Math.PI * i) / length;
 			Vector3f segmentCenter = new Vector3f((float)Math.sin(phi), 0, (float)Math.cos(phi));
 
@@ -42,7 +43,7 @@ public class CatmullRomSurfaces {
 				Vector3f right = new Vector3f(segmentCenter).normalize().mul(cylinderRadius * (float) Math.sin(theta));
 				Vector3f toroidPoint = new Vector3f(segmentCenter).add(up).add(right);
 				
-				toroidGrid[i][j] = toroidPoint;
+				toroidGrid.set(i, j, toroidPoint);
 			}
 		}
 		
@@ -67,10 +68,10 @@ public class CatmullRomSurfaces {
 		return patches;
 	}
 	
-	public static List<Vector3f> generateCyclicCatmullRomPatches(Vector3f[][] surfacePoints) {
+	public static List<Vector3f> generateCyclicCatmullRomPatches(CircularGrid<Vector3f> surfacePoints) {
 		List<Vector3f> patches = new ArrayList<>();
-		int gridLength = surfacePoints.length;
-		int gridWidth = surfacePoints[0].length;
+		int gridLength = surfacePoints.HEIGHT;
+		int gridWidth = surfacePoints.WIDTH;
 
 		for(int iPatch = 0; iPatch != gridLength; ++iPatch) {
 			for(int jPatch = 0; jPatch != gridWidth; ++jPatch) {
@@ -78,7 +79,7 @@ public class CatmullRomSurfaces {
 					for(int j = 0; j != 4; ++j) {
 						int gridCoordinateI = (iPatch + i) % gridLength;
 						int gridCoordinateJ = (jPatch + j) % gridWidth;
-						Vector3f point = surfacePoints[gridCoordinateI][gridCoordinateJ];
+						Vector3f point = surfacePoints.get(gridCoordinateI, gridCoordinateJ);
 						patches.add(point);
 					}
 				}
