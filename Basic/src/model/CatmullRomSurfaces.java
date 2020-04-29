@@ -18,30 +18,28 @@ public class CatmullRomSurfaces {
 		return new SplineSurface(surface, points);
 	}
 	public static SplineSurface crToroidSurface() {
-		List<Vector3f> patchData = generateCyclicCatmullRomPatches(crToroidPatchData());
+		List<Vector3f> patchData = generateCyclicCatmullRomPatches(crToroidPatchData(3,3,10,1));
 		RenderableObject surface = RenderableObject.catmullRomSurfaceFactory(patchData);
 		RenderableObject points = RenderableObject.setupPointCloud(patchData);
 		
 		return new SplineSurface(surface, points);
 	}
 	
-	private static Vector3f[][] crToroidPatchData(){
-		int width = 3;
-		int length = 3;
+	public static Vector3f[][] crToroidPatchData(int length, int width, float toroidRadius, float cylinderRadius){
 		Vector3f[][] toroidGrid = new Vector3f[length][];
 		
 		for(int i = 0; i != length; ++i) {
 			toroidGrid[i] = new Vector3f[width];
 			float phi = (float) (2*Math.PI * i) / length;
 			Vector3f segmentCenter = new Vector3f((float)Math.sin(phi), 0, (float)Math.cos(phi));
-			System.out.println(i + ", " + phi + ", "  + segmentCenter);
-			segmentCenter.mul(10);
+
+			segmentCenter.mul(toroidRadius);
 			
 			for(int j = 0; j != width; ++j) {
 				float theta = (float) (2*Math.PI * j) / width;
 				
-				Vector3f up = new Vector3f(0,1,0).mul((float) Math.cos(theta));
-				Vector3f right = new Vector3f(segmentCenter).normalize().mul((float) Math.sin(theta));
+				Vector3f up = new Vector3f(0,cylinderRadius,0).mul((float) Math.cos(theta));
+				Vector3f right = new Vector3f(segmentCenter).normalize().mul(cylinderRadius * (float) Math.sin(theta));
 				Vector3f toroidPoint = new Vector3f(segmentCenter).add(up).add(right);
 				
 				toroidGrid[i][j] = toroidPoint;
@@ -51,7 +49,7 @@ public class CatmullRomSurfaces {
 		return toroidGrid;
 	}
 	
-	private static List<Vector3f> generateNonCyclicCatmullRomPatches(Vector3f[][] surfacePoints) {
+	public static List<Vector3f> generateNonCyclicCatmullRomPatches(Vector3f[][] surfacePoints) {
 		List<Vector3f> patches = new ArrayList<>();
 		//TODO
 
@@ -69,14 +67,13 @@ public class CatmullRomSurfaces {
 		return patches;
 	}
 	
-	private static List<Vector3f> generateCyclicCatmullRomPatches(Vector3f[][] surfacePoints) {
+	public static List<Vector3f> generateCyclicCatmullRomPatches(Vector3f[][] surfacePoints) {
 		List<Vector3f> patches = new ArrayList<>();
 		int gridLength = surfacePoints.length;
 		int gridWidth = surfacePoints[0].length;
 
 		for(int iPatch = 0; iPatch != gridLength; ++iPatch) {
 			for(int jPatch = 0; jPatch != gridWidth; ++jPatch) {
-				System.out.println("rawr" + iPatch + " " + jPatch);
 				for(int i = 0; i != 4; ++i) {
 					for(int j = 0; j != 4; ++j) {
 						int gridCoordinateI = (iPatch + i) % gridLength;

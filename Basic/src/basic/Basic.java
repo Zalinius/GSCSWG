@@ -5,6 +5,10 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
 import org.lwjgl.system.*;
 
+import animation.AnimatedCatmullRomSurface;
+import animation.physics.ForceField;
+import animation.physics.PointGravity;
+import animation.physics.SinField;
 import model.BezierCylinder;
 import model.BezierCylinder2;
 import model.CatmullRomSurfaces;
@@ -101,7 +105,9 @@ public class Basic {
 
 	private void loop() {
 		int activeProgram;
-		SplineSurface surface = CatmullRomSurfaces.crToroidSurface();
+		AnimatedCatmullRomSurface surface = new AnimatedCatmullRomSurface();
+		ForceField field = new SinField();
+		
 		RenderableObject axes = RenderableObject.AXES_COLORED;
 		RenderableObject model = surface.SURFACE;
 		RenderableObject sample = surface.POINTS;
@@ -216,7 +222,7 @@ public class Basic {
 			
 			float delta = (float) dt;
 			update(delta);
-			//bc.update(delta);
+			surface.update(field, delta);
 		}
 	}
 
