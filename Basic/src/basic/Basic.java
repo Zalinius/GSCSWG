@@ -7,6 +7,7 @@ import org.lwjgl.system.*;
 
 import model.BezierCylinder;
 import model.BezierCylinder2;
+import model.CatmullRomSurfaces;
 import model.RenderableObject;
 import model.SplineSurface;
 
@@ -100,7 +101,7 @@ public class Basic {
 
 	private void loop() {
 		int activeProgram;
-		SplineSurface surface = SplineSurface.crCubeFacePatch();
+		SplineSurface surface = CatmullRomSurfaces.crToroidSurface();
 		RenderableObject axes = RenderableObject.AXES_COLORED;
 		RenderableObject model = surface.SURFACE;
 		RenderableObject sample = surface.POINTS;
