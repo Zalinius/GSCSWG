@@ -67,6 +67,7 @@ public class RenderableObject {
 	public static final RenderableObject BEZIER_PATCH_SURFACE = bezierPatchSurface();
 	
 	public static final RenderableObject CATMULL_ROM_SURFACE = catmullRomSurface();
+	public static final RenderableObject CATMULL_ROM_POINTS = catmullRomPoints();
 
 	public int shaderProgram() {
 		return attachedShader.SHADER_PROGRAM;
@@ -209,7 +210,7 @@ public class RenderableObject {
 			
 			for(int j = 0; j != HEIGHT; ++j) {
 				float height;
-				height = (float) (Math.sin(2*i)*Math.sin(2*j));
+				height = (float) (i*Math.sin(2*i)*Math.sin(2*j));
 				
 				pointsArray[i][j] = new Vector3f(i,j,height);
 			}
@@ -218,7 +219,7 @@ public class RenderableObject {
 		return pointsArray;
 	}
 	
-	private static RenderableObject catmullRomSurface() {
+	private static List<Vector3f> catmullRomSurfacePatches() {
 		Vector3f[][] surfacePoints = catmullRomSurfacePoints();
 		List<Vector3f> patches = new ArrayList<>();
 		
@@ -233,8 +234,17 @@ public class RenderableObject {
 				}
 			}
 		}
-
-		return setupPoints(patches, GL40.GL_PATCHES, ShaderFactory.CATMULL_ROM_SURFACE);
+		
+		return patches;
+	}
+	
+	
+	
+	private static RenderableObject catmullRomSurface() {
+		return setupPoints(catmullRomSurfacePatches(), GL40.GL_PATCHES, ShaderFactory.CATMULL_ROM_SURFACE);
+	}
+	private static RenderableObject catmullRomPoints() {
+		return setupPointCloud(catmullRomSurfacePatches());
 	}
 
 
@@ -460,5 +470,9 @@ public class RenderableObject {
 	public static RenderableObject setupPoints(List<Vector3f> points, int renderMode, Shader shader) {
 		return setupVertices(collapseVectorList(points), renderMode, shader);
 	}
+	public static RenderableObject catmullRomSurfaceFactory(List<Vector3f> patchData) {
+		return setupPoints(patchData, GL40.GL_PATCHES, ShaderFactory.CATMULL_ROM_SURFACE);
+	}
+	
 
 }

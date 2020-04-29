@@ -8,6 +8,7 @@ import org.lwjgl.system.*;
 import model.BezierCylinder;
 import model.BezierCylinder2;
 import model.RenderableObject;
+import model.SplineSurface;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
@@ -99,10 +100,10 @@ public class Basic {
 
 	private void loop() {
 		int activeProgram;
-		BezierSnake bc = new BezierSnake();
+		SplineSurface surface = SplineSurface.crCubeFacePatch();
 		RenderableObject axes = RenderableObject.AXES_COLORED;
-		RenderableObject model = bc.getModel();
-		RenderableObject sample = bc.getPoints();
+		RenderableObject model = surface.SURFACE;
+		RenderableObject sample = surface.POINTS;
     
 		glPointSize(5);
 
