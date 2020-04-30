@@ -11,17 +11,13 @@ public class PointGravity extends ForceField {
 		this.center = center;
 		this.mass = mass;
 	}
-	
+
 	@Override
-	public void accelerate(float delta, Vector3f point) {
-		accelerate(delta, point, 1f);
-	}
-	@Override
-	public void accelerate(float delta, Vector3f point, float mass) {
+	public Vector3f accelerate(float delta, Vector3f point) {
 		Vector3f force = new Vector3f(center).sub(point).normalize();
-		float distance = Math.max(1f, center.distanceSquared(point));
-		force.mul(this.mass * delta).div(distance);
-		point.add(force);
+		float distance = Math.max(1f, center.distance(point));
+		force.mul(this.mass * delta).div((float) Math.pow(distance, 1.4));
+		return force;
 	}
 
 }

@@ -7,12 +7,15 @@ import org.lwjgl.system.*;
 
 import animation.AnimatedCatmullRomSurface;
 import animation.physics.ForceField;
+import animation.physics.PointGravity;
 import animation.physics.SinField;
 import model.RenderableObject;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 
 import java.nio.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.lwjgl.glfw.Callbacks.*;
 import static org.lwjgl.glfw.GLFW.*;
@@ -100,7 +103,11 @@ public class Basic {
 	private void loop() {
 		int activeProgram;
 		AnimatedCatmullRomSurface surface = new AnimatedCatmullRomSurface();
-		ForceField field = new SinField();
+		
+		List<ForceField> forceFields = new ArrayList<>();
+		forceFields.add(new SinField());
+		forceFields.add(new PointGravity(new Vector3f(1,2,0),1f));
+		forceFields.add(new PointGravity(new Vector3f(-15,-4,0),1.5f));
 		
 		RenderableObject axes = RenderableObject.AXES_COLORED;
 		RenderableObject model = surface.SURFACE;
@@ -216,7 +223,7 @@ public class Basic {
 			
 			float delta = (float) dt;
 			update(delta);
-			surface.update(field, delta);
+			surface.update(forceFields, delta);
 		}
 	}
 
@@ -283,9 +290,8 @@ public class Basic {
 
 	private int tesselation;
 	private void initializeTesselation() {
-		//4 for bezier splines
 		glPatchParameteri(OpenGLConstants.patchesTarget, 16);
-		tesselation = 4;
+		tesselation = OpenGLConstants.maximumTesselationLevel();
 	}
 
 }

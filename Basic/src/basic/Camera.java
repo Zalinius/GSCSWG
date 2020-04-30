@@ -28,9 +28,9 @@ public class Camera {
 	
 	
 	public Camera(long window) {
-		position = new Vector3f(0,0,1f);
-		direction = new Vector3f(0,0,-1f);
-		center = new Vector3f().add(direction).add(position); 
+		position = new Vector3f(0,15f,15f);
+		direction = new Vector3f(position);
+		center = new Vector3f().add(direction).mul(-1).normalize(); 
 		up = new Vector3f(0,1,0);
 		side = new Vector3f(1,0,0);		
 		DoubleBuffer mouseBuffX = BufferUtils.createDoubleBuffer(1);
@@ -38,9 +38,11 @@ public class Camera {
 		glfwGetCursorPos(window, mouseBuffX, mouseBuffY);
 		lastMousePosX = mouseBuffX.get(0);
 		lastMousePosY = mouseBuffY.get(0);
-		movement = new Vector2i();
-		speed = 1;
+		cameraVerticalAngle = -50f;
 		
+		movement = new Vector2i();
+		speed = 8;
+		mouseMoved(lastMousePosX,lastMousePosY);
 		view = new Matrix4f();
 		view.lookAt(position, center, up, new Matrix4f());
 	}
@@ -84,12 +86,6 @@ public class Camera {
 				movement.x += 1;
 			}else if (action == GLFW_RELEASE) {
 				movement.x -= 1;
-			}
-		} else if(key == GLFW_KEY_LEFT_SHIFT) {
-			if(action == GLFW_PRESS) {
-				speed = 5;
-			}else if (action == GLFW_RELEASE) {
-				speed = 1;
 			}
 		}
 	}
