@@ -1,3 +1,4 @@
-# Generation of Spline Curves and Surfaces Within the GPU
+## Generation of Spline Curves and Surfaces Within the GPU
 
+### Abstract
 In computer graphics, frequently buffering high-resolution models (models defined with a large number of vertices) to the GPU is a significant performance bottleneck, as sending data between the CPU and GPU isrelatively slow compared to the processing speed of either device. For thisreason, a complex model is usually sent once to the GPU, where simple andlimited transformations are applied to it. Alternatively, by drawing high-resolution models using a relatively small number of vertices, the buffering between devices becomes significantly less costly, and complex animation operations can be performed in the CPU. Using spline surface functions, models of any resolution can be represented with relatively few vertices. The models can be rendered by generating the vertices at run time, in the GPU,from the spline surface’s control points and function. This enables the implementation of unusual real time animation which act non-linearly on vertices, such as evolving force fields and inter-vertex forces.
