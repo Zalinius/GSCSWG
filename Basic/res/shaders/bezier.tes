@@ -1,36 +1,11 @@
 #version 430 core
 
-
 uniform mat4 mm;
 uniform mat4 vm;
 uniform mat4 pm;
 
-
-
 //TES options
 layout(isolines, equal_spacing) in;
-
-in gl_PerVertex
-{
-  vec4 gl_Position;
-  float gl_PointSize;
-  float gl_ClipDistance[];
-} input_from_TCS[];
-
-//Built-in inputs
-in vec3 gl_TessCoord[];
-//Each TessCoord received is of the form <x,y> where x is 0, and y is on [0,1].
-//We'll be using y as our curve parameter input
-
-in int gl_PatchVerticesIn[];
-in int gl_PrimitiveID[];
-
-//Built-in outputs
-out gl_PerVertex {
-  vec4 gl_Position;
-  float gl_PointSize;
-  float gl_ClipDistance[];
-};
 
 void main()
 { 
@@ -39,7 +14,7 @@ void main()
   
   mat4 positionMatrix;
   for(int i = 0; i != 4; ++i){
-    positionMatrix[i] = input_from_TCS[i].gl_Position;
+    positionMatrix[i] = gl_in[i].gl_Position;
   }
   
   mat4 bezier;

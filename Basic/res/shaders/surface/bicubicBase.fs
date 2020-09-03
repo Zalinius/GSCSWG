@@ -1,4 +1,4 @@
-#version 430
+#version 460 core
 
 in vec3 out_normal;
 in vec3 out_fragmentPosition; //in model space

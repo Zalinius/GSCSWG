@@ -5,38 +5,18 @@ uniform mat4 mm;
 uniform mat4 vm;
 uniform mat4 pm;
 
-
 //TES options
 layout(triangles, equal_spacing, ccw) in;
 
 //Tesselation control shader output
 in vec2 vertexTexCoord[];
 
-in gl_PerVertex
-{
-  vec4 gl_Position;
-  float gl_PointSize;
-  float gl_ClipDistance[];
-} input_from_TCS[];
-
-//Built-in inputs
-in vec3 gl_TessCoord[];
-in int gl_PatchVerticesIn[];
-in int gl_PrimitiveID[];
-
-//Built-in outputs
-out gl_PerVertex {
-  vec4 gl_Position;
-  float gl_PointSize;
-  float gl_ClipDistance[];
-};
-
 void main()
 { 
-  gl_Position = gl_TessCoord[0].x * input_from_TCS[0].gl_Position
-			  + gl_TessCoord[0].y * input_from_TCS[1].gl_Position
-			  + gl_TessCoord[0].z * input_from_TCS[2].gl_Position;
-  float centrality = min(min(gl_TessCoord[0].x, gl_TessCoord[0].y), gl_TessCoord[0].z);
+  gl_Position = gl_TessCoord.x * gl_in[0].gl_Position
+			  + gl_TessCoord.y * gl_in[1].gl_Position
+			  + gl_TessCoord.z * gl_in[2].gl_Position;
+  float centrality = min(min(gl_TessCoord.x, gl_TessCoord.y), gl_TessCoord.z);
   gl_Position.z += 4*centrality*centrality;
   gl_Position = pm*vm*mm*gl_Position;
 }

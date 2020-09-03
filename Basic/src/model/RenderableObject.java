@@ -332,7 +332,14 @@ public class RenderableObject {
 	}
 
 	public static RenderableObject setupPointCloud(List<Vector3f> points) {
-		return setupPoints(points, GL11.GL_POINTS, ShaderFactory.BASIC);
+		RenderableObject obj = null;
+		try {
+			obj = setupPoints(points, GL11.GL_POINTS, ShaderFactory.BASIC);
+		} catch (Exception e) {
+			System.out.println(e.getCause());
+			// TODO: handle exception
+		}
+		return obj;
 	}
 
 	private static RenderableObject bezierPatchAsPoints() {

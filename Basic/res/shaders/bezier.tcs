@@ -5,36 +5,10 @@ uniform float tessLevel;
 
 //output patch size
 layout(vertices = 4) out;
-
-//Built-in variables
-
-in int gl_PatchVerticesIn[];
-in int gl_PrimitiveID[];
-in int gl_InvocationID[];
-
-//Vertex shader output
-in gl_PerVertex
-{
-  vec4 gl_Position;
-  float gl_PointSize;
-  float gl_ClipDistance[];
-} vertex_in[gl_MaxPatchVertices];
-
-//Built-in output variables
-patch out float gl_TessLevelOuter[4];
-patch out float gl_TessLevelInner[2];
-
-out gl_PerVertex
-{
-  vec4 gl_Position;
-  float gl_PointSize;
-  float gl_ClipDistance[];
-} output_to_TES[];
-
  
 void main(void)
 {
   gl_TessLevelOuter[0] = 1;  //Iso-lines
   gl_TessLevelOuter[1] = tessLevel; //many wide, 1 high
-  output_to_TES[gl_InvocationID].gl_Position = vertex_in[gl_InvocationID].gl_Position;
+  gl_out[gl_InvocationID].gl_Position = gl_in[gl_InvocationID].gl_Position;
 }

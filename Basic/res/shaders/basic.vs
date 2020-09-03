@@ -1,7 +1,5 @@
 #version 430
 layout(location = 0) in vec3 vertex;
- 
-out gl_PerVertex { vec4 gl_Position; };
 
 uniform mat4 mm;
 uniform mat4 vm;

@@ -1,8 +1,8 @@
 #version 430
+
 layout(location = 0) in vec3 vertex;
 layout(location = 1) in vec3 color_in;
  
-out gl_PerVertex { vec4 gl_Position; };
 out vec3 interpolate_color;
 
 uniform mat4 mm;

@@ -43,23 +43,30 @@ public class ShaderFactory {
 	public static final SurfaceShader TRIANGLE_TESS = new SurfaceShader(curveTessShadersProgram());
 	
 	private static int basicShadersProgram() {
-		return makeShader(new File("res/shaders/"), "basic");
+		return makeShader(new File("Basic/res/shaders/"), "basic");
 	}
 	private static int colorShadersProgram() {
-		return makeShader(new File("res/shaders/"), "color");
+		return makeShader(new File("Basic/res/shaders/"), "color");
 	}
 	private static int curveTessShadersProgram() {
-		return makeShader(new File("res/shaders/"), "simple");
+		return makeShader(new File("Basic/res/shaders/"), "simple");
 	}
 	private static int bezierSplineShadersProgram() {
-		return makeShader(new File("res/shaders/"), "bezier");
+		return makeShader(new File("Basic/res/shaders/"), "bezier");
 	}
 	
 	private static int bezierPatchShadersProgram() {
-		return makeShader(new File("res/shaders/surface/"), "bicubicBase", "bicubicBezier");
+	       System.out.println("Working Directory = " + System.getProperty("user.dir"));
+		return makeShader(new File("Basic/res/shaders/surface/"), "bicubicBase", "bicubicBezier");
 	}
 	private static int crPatchShadersProgram() {
-		return makeShader(new File("res/shaders/surface/"), "bicubicBase", "bicubicCR");
+		File local = new File(".");
+		System.out.println("Location: " + local);
+		File[] childs = local.listFiles();
+		for (int i = 0; i < childs.length; i++) {
+			System.out.println(childs[i]);
+		}
+		return makeShader(new File("Basic/res/shaders/surface/"), "bicubicBase", "bicubicCR");
 	}
 
 
@@ -75,7 +82,8 @@ public class ShaderFactory {
 	 */
 	private static int makeShader(File shaderProgramDirectory, String baseShaderName, String splineShaderName) {
 		if(!shaderProgramDirectory.isDirectory()) {
-			throw new RuntimeException("Not a directory");
+			System.out.println(System.getProperty("user.dir"));
+			throw new RuntimeException("Not a directory: " + shaderProgramDirectory.getAbsolutePath());
 		}
 		if(!shaderProgramDirectory.exists()) {
 			throw new RuntimeException("Directory does not exist");
@@ -133,7 +141,7 @@ public class ShaderFactory {
             System.err.println(shaderLog);
         }
         if (compiled == 0) {
-            throw new AssertionError("Could not compile shader");
+            throw new AssertionError("Could not compile shader " + name);
         }
 	}
 	

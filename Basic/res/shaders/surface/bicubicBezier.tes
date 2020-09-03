@@ -1,4 +1,4 @@
-#version 430 core
+#version 460 core
 
 uniform mat4 mm;
 uniform mat4 vm;
@@ -6,35 +6,16 @@ uniform mat4 pm;
 
 //TES options
 layout(quads, equal_spacing) in;
-
-in gl_PerVertex
-{
-  vec4 gl_Position;
-  float gl_PointSize;
-  float gl_ClipDistance[];
-} input_from_TCS[];
-
-//Built-in inputs
-in vec3 gl_TessCoord[];
 //Each TessCoord received is of the form <x,y> where x is 0, and y is on [0,1].
 //We'll be using x and y as our spline surface parameters
 
-in int gl_PatchVerticesIn[];
-in int gl_PrimitiveID[];
-
-//Custom block outputs
-out gl_PerVertex {
-  vec4 gl_Position;
-  float gl_PointSize;
-  float gl_ClipDistance[];
-};
 out vec3 normal;
 out vec3 fragmentPosition; // in model space
 
 void main()
 { 
-  float u = gl_TessCoord[0].x;
-  float v = gl_TessCoord[0].y;
+  float u = gl_TessCoord.x;
+  float v = gl_TessCoord.y;
   vec4 uParameter = vec4(1, u, u*u, u*u*u);
   vec4 vParameter = vec4(1, v, v*v, v*v*v);
   
@@ -46,9 +27,9 @@ void main()
   mat4 positionMatrixY;
   mat4 positionMatrixZ;
   for(int i = 0; i != 16; ++i){
-    positionMatrixX[i/4][i%4] = input_from_TCS[i].gl_Position.x;
-    positionMatrixY[i/4][i%4] = input_from_TCS[i].gl_Position.y;
-    positionMatrixZ[i/4][i%4] = input_from_TCS[i].gl_Position.z;
+    positionMatrixX[i/4][i%4] = gl_in[i].gl_Position.x;
+    positionMatrixY[i/4][i%4] = gl_in[i].gl_Position.y;
+    positionMatrixZ[i/4][i%4] = gl_in[i].gl_Position.z;
   }
   
   mat4 bezier;
