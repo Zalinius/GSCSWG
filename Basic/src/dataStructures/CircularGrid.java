@@ -1,5 +1,6 @@
 package dataStructures;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
@@ -20,7 +21,8 @@ public class CircularGrid<E> implements Iterable<E> {
 		}
 	}
 	
-	
+	//Because only objects of type E can be added to the data structure, this cast is safe
+	@SuppressWarnings("unchecked")
 	public E get(int i, int j) {
 		i = modulo(i, HEIGHT);
 		j = modulo(j, WIDTH);
