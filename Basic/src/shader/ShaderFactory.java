@@ -61,7 +61,6 @@ public class ShaderFactory {
 	}
 	private static int crPatchShadersProgram() {
 		File local = new File(".");
-		System.out.println("Location: " + local);
 		File[] childs = local.listFiles();
 		for (int i = 0; i < childs.length; i++) {
 			System.out.println(childs[i]);
@@ -124,7 +123,7 @@ public class ShaderFactory {
         int linked = glGetProgrami(program, GL_LINK_STATUS);
         String programLog = glGetProgramInfoLog(program);
         if (programLog.trim().length() > 0) {
-            System.err.println("Link error: " + programLog);
+            System.err.println("Link error in " + shaderName + " shaders: " + programLog);
         }
         if (linked == 0) {
             throw new AssertionError("Could not link program " + '"' + shaderName + '"');
